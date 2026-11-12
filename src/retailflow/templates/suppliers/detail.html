@@ -1,0 +1,26 @@
+{% extends "suppliers/base.html" %}
+{% block title %}{{ supplier.name }} | RetailFlow{% endblock %}
+{% block content %}
+<a class="supplier-back" href="{% url 'supplier_list' %}">&larr; Back to suppliers</a>
+<div class="supplier-header">
+    <div><h1>{{ supplier.name }}</h1><p class="supplier-muted">{{ supplier.supplier_code }} · <span class="status {{ supplier.is_active|yesno:'active,inactive' }}">{{ supplier.is_active|yesno:'Active,Inactive' }}</span></p></div>
+    <div class="supplier-actions">
+        <a class="button" href="{% url 'edit_supplier' supplier.pk %}" data-rf-popup="{% url 'edit_supplier' supplier.pk %}" data-rf-title="Edit Supplier — {{ supplier.name }}" data-rf-width="960" data-rf-height="520">Edit supplier</a>
+        <form method="post" action="{% if supplier.is_active %}{% url 'deactivate_supplier' supplier.pk %}{% else %}{% url 'activate_supplier' supplier.pk %}{% endif %}">
+            {% csrf_token %}
+            <button class="button secondary" type="submit" data-confirm="Are you sure you want to {% if supplier.is_active %}deactivate{% else %}activate{% endif %} {{ supplier.name }}? Supplier history and existing purchase records will be preserved.">{% if supplier.is_active %}Deactivate{% else %}Activate{% endif %} supplier</button>
+        </form>
+    </div>
+</div>
+<dl class="card supplier-details">
+    {% for label, value in fields %}<div><dt>{{ label }}</dt><dd>{% if value is True %}Yes{% elif value is False %}No{% elif value == '' or value is None %}—{% else %}{{ value }}{% endif %}</dd></div>{% endfor %}
+    <div><dt>WhatsApp consent recorded</dt><dd>{{ supplier.whatsapp_opt_in_at|default:'Not recorded' }}</dd></div>
+    <div><dt>Created</dt><dd>{{ supplier.created_at }}</dd></div><div><dt>Last updated</dt><dd>{{ supplier.updated_at }}</dd></div>
+</dl>
+<p class="supplier-muted">WhatsApp preferences are stored for future use. No messages are sent.</p>
+<div class="supplier-header">
+    <h2>Linked products</h2>
+    <a class="button" href="{% url 'add_supplier_product' %}?supplier={{ supplier.pk }}" data-rf-popup="{% url 'add_supplier_product' %}?supplier={{ supplier.pk }}" data-rf-title="Assign Product to {{ supplier.name }}" data-rf-width="720" data-rf-height="340">Assign product</a>
+</div>
+{% include "suppliers/links.html" %}
+{% endblock %}

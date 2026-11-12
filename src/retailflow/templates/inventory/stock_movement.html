@@ -1,0 +1,425 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Inventory Management | RetailFlow{% endblock %}
+{% block active_nav %}inventory{% endblock %}
+
+{% block extra_head %}
+<style>
+    .inventory-page {
+        width: 100%;
+    }
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+    }
+    .page-header h1 {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0 0 6px;
+        letter-spacing: -0.02em;
+    }
+    .muted {
+        color: var(--muted);
+        font-size: 13px;
+    }
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 22px;
+    }
+    .stat-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 20px;
+    }
+    .stat-label {
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+    .stat-value {
+        font-size: 26px;
+        font-weight: 700;
+        margin-top: 10px;
+        letter-spacing: -0.02em;
+    }
+    .panel {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        margin-bottom: 22px;
+        overflow: hidden;
+    }
+    .panel-header {
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--line);
+    }
+    .panel-header h2 {
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0 0 4px;
+    }
+    .panel-header p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+    }
+    .form-body {
+        padding: 22px;
+    }
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 20px;
+    }
+    .field label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 7px;
+    }
+    .field input, .field select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+        font-size: 13px;
+    }
+    .field input:focus, .field select:focus {
+        border-color: var(--ink);
+        outline: none;
+    }
+    .error-text {
+        display: block;
+        margin-top: 5px;
+        color: var(--ink);
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .table-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 16px 22px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+    }
+    .search-input {
+        width: 280px;
+        max-width: 100%;
+        padding: 9px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        font-size: 13px;
+    }
+    .table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+    .inventory-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        white-space: nowrap;
+    }
+    .inventory-table th, .inventory-table td {
+        padding: 13px 20px;
+        border-bottom: 1px solid var(--line);
+        font-size: 13px;
+    }
+    .inventory-table th {
+        background: var(--cream);
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+    .inventory-table tbody tr:hover td {
+        background: #faf9f5;
+    }
+    .product-name {
+        font-weight: 600;
+    }
+    .badge {
+        display: inline-block;
+        padding: 5px 9px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .in-stock {
+        color: var(--ink);
+        background: var(--cream);
+    }
+    .low-stock {
+        color: var(--ink);
+        background: var(--cream);
+        border: 1px solid var(--ink);
+    }
+    .out-of-stock {
+        color: #fff;
+        background: var(--ink);
+    }
+    .empty {
+        text-align: center;
+        padding: 36px;
+        color: var(--muted);
+    }
+    @media (max-width: 768px) {
+        .stats, .form-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="inventory-page">
+    <div class="page-header">
+        <div>
+            <h1>Inventory Management</h1>
+            <p class="muted">
+                Track available stock, record stock movements, and monitor damaged products.
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <a href="{% url 'stock_movement' %}"
+               class="button"
+               data-rf-popup="{% url 'stock_movement' %}"
+               data-rf-title="Record Stock Movement"
+               data-rf-width="700"
+               data-rf-height="270">
+                + Record Stock Movement
+            </a>
+            <a href="{% url 'product_list' %}" class="button secondary">
+                View Products &rarr;
+            </a>
+        </div>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-label">Products With Inventory</div>
+            <div class="stat-value">{{ inventory_items|length }}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Available Units</div>
+            <div class="stat-value" id="totalStock">0</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Low / Out of Stock</div>
+            <div class="stat-value" id="lowStockCount">0</div>
+        </div>
+    </div>
+
+    <!-- Movement entry form -->
+    <section class="panel">
+        <div class="panel-header">
+            <h2>Record Stock Movement</h2>
+            <p>Select an active product and record incoming, outgoing, or damaged stock.</p>
+        </div>
+
+        <div class="form-body">
+            {% if form.non_field_errors %}
+                <div style="margin-bottom: 16px; padding: 12px; background: var(--cream); border: 1px solid var(--ink); border-left-width: 4px; border-radius: 6px;">
+                    {% for error in form.non_field_errors %}
+                        <div class="error-text">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'stock_movement' %}">
+                {% csrf_token %}
+
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="{{ form.product.id_for_label }}">
+                            Product *
+                        </label>
+                        {{ form.product }}
+                        {% for error in form.product.errors %}
+                            <span class="error-text">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="field">
+                        <label for="{{ form.movement_type.id_for_label }}">
+                            Movement Type *
+                        </label>
+                        {{ form.movement_type }}
+                        {% for error in form.movement_type.errors %}
+                            <span class="error-text">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="field">
+                        <label for="{{ form.quantity.id_for_label }}">
+                            Quantity *
+                        </label>
+                        {{ form.quantity }}
+                        {% for error in form.quantity.errors %}
+                            <span class="error-text">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <div class="field">
+                        <label for="{{ form.reason.id_for_label }}">
+                            Reason / Reference
+                        </label>
+                        {{ form.reason }}
+                        {% for error in form.reason.errors %}
+                            <span class="error-text">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <button type="submit" class="button">
+                    Save Stock Movement
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Company inventory records -->
+    <section class="panel">
+        <div class="table-toolbar">
+            <div>
+                <h2>Current Stock Levels</h2>
+                <p class="muted">Live inventory balances for your company's active products.</p>
+            </div>
+
+            <input
+                type="search"
+                id="inventorySearch"
+                class="search-input"
+                placeholder="Search by product name or SKU..."
+            >
+        </div>
+
+        <div class="table-wrapper">
+            <table class="inventory-table" id="inventoryTable">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>SKU</th>
+                        <th>Available Quantity</th>
+                        <th>Low Stock Threshold</th>
+                        <th>Status</th>
+                        <th>Damaged Units</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in inventory_items %}
+                        <tr>
+                            <td class="product-name">
+                                {{ item.product.name }}
+                            </td>
+                            <td>
+                                {{ item.product.sku }}
+                            </td>
+                            <td class="quantity">
+                                {{ item.quantity }}
+                            </td>
+                            <td>
+                                {{ item.product.low_stock_threshold }}
+                            </td>
+                            <td>
+                                {% if item.quantity == 0 %}
+                                    <span class="badge out-of-stock">
+                                        Out of stock
+                                    </span>
+                                {% elif item.quantity <= item.product.low_stock_threshold %}
+                                    <span class="badge low-stock">
+                                        Low stock
+                                    </span>
+                                {% else %}
+                                    <span class="badge in-stock">
+                                        In stock
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {{ item.damaged_quantity }}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="empty">
+                                No inventory records found. Add active products
+                                and record your first stock movement.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<script>
+    // Search by product name or SKU.
+    const searchInput = document.getElementById("inventorySearch");
+    const tableRows = document.querySelectorAll("#inventoryTable tbody tr");
+
+    if (searchInput) {
+        searchInput.addEventListener("input", function () {
+            const query = this.value.trim().toLowerCase();
+
+            tableRows.forEach(function (row) {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(query) ? "" : "none";
+            });
+        });
+    }
+
+    // Calculate total available stock and low/out-of-stock products.
+    const rows = document.querySelectorAll("#inventoryTable tbody tr");
+
+    let totalStock = 0;
+    let lowStockCount = 0;
+
+    rows.forEach(function (row) {
+        const quantityCell = row.querySelector(".quantity");
+
+        if (!quantityCell) {
+            return;
+        }
+
+        totalStock += Number(quantityCell.textContent.trim());
+
+        const status = row.querySelector(".badge");
+
+        if (
+            status &&
+            (
+                status.classList.contains("low-stock") ||
+                status.classList.contains("out-of-stock")
+            )
+        ) {
+            lowStockCount++;
+        }
+    });
+
+    const totalStockEl = document.getElementById("totalStock");
+    const lowStockCountEl = document.getElementById("lowStockCount");
+    if (totalStockEl) totalStockEl.textContent = totalStock;
+    if (lowStockCountEl) lowStockCountEl.textContent = lowStockCount;
+</script>
+{% endblock %}

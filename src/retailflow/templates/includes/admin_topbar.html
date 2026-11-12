@@ -1,0 +1,44 @@
+<header class="topbar">
+    <div class="left-top">
+        <button class="toggle-btn"
+                aria-expanded="true"
+                aria-controls="sidebar"
+                onclick="toggleSidebar()"
+                aria-label="Toggle sidebar">
+            <svg class="icon">
+                <use href="#i-menu"/>
+            </svg>
+        </button>
+
+        {% if not request.user.employee or request.user.employee.role != 'CASHIER' %}
+        <div class="search-box">
+            <svg class="icon">
+                <use href="#i-search"/>
+            </svg>
+            <input type="text"
+                   placeholder="Search navigation...">
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="user-area">
+        <div class="notification" aria-hidden="true">
+            <svg class="icon">
+                <use href="#i-bell"/>
+            </svg>
+        </div>
+
+        <div class="user">
+            <div class="avatar">
+                {% if request.user.employee and request.user.employee.first_name %}{{ request.user.employee.first_name|first|upper }}{% elif request.user.first_name %}{{ request.user.first_name|first|upper }}{% else %}A{% endif %}
+            </div>
+
+            <div class="user-info">
+                <strong>
+                    {% if request.user.employee and request.user.employee.first_name %}{{ request.user.employee.first_name }} {{ request.user.employee.last_name }}{% elif request.user.first_name %}{{ request.user.first_name }} {{ request.user.last_name }}{% else %}Administrator{% endif %}
+                </strong>
+                <small>{% if request.user.employee %}{{ request.user.employee.get_role_display }}{% else %}Administrator{% endif %}</small>
+            </div>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,13 @@
+{% extends "purchases/base.html" %}
+{% block purchase_content %}
+<div class="purchase-heading"><h1>Goods receipts</h1><a class="button" href="{% url 'purchase_order_list' %}">Select order to receive</a></div>
+<div class="card purchase-table"><table><thead><tr><th>GRN</th><th>Purchase order</th><th>Receipt date</th><th>Delivery reference</th><th>Status</th></tr></thead><tbody>
+{% for receipt in page_obj %}<tr>
+    <td><a href="{% url 'goods_receipt_detail' receipt.pk %}" data-rf-popup="{% url 'goods_receipt_detail' receipt.pk %}" data-rf-title="Goods Receipt {{ receipt.number }}" data-rf-width="900" data-rf-height="420"><strong>{{ receipt.number }}</strong></a></td>
+    <td><a href="{% url 'purchase_order_detail' receipt.order_id %}" data-rf-popup="{% url 'purchase_order_detail' receipt.order_id %}" data-rf-title="Purchase Order {{ receipt.order.number }}">{{ receipt.order.number }}</a></td>
+    <td>{{ receipt.receipt_date }}</td>
+    <td>{{ receipt.delivery_reference|default:"—" }}</td>
+    <td><span class="status">{{ receipt.get_status_display }}</span></td>
+</tr>{% empty %}<tr><td colspan="5">No goods receipts yet.</td></tr>{% endfor %}
+</tbody></table></div>{% include "purchases/pagination.html" %}
+{% endblock %}

@@ -1,0 +1,195 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Employees | RetailFlow{% endblock %}
+{% block active_nav %}employees{% endblock %}
+
+{% block extra_head %}
+<style>
+    .employee-page {
+        width: 100%;
+    }
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+    }
+    .page-header h1 {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0 0 6px;
+        letter-spacing: -0.02em;
+    }
+    .muted {
+        color: var(--muted);
+        font-size: 13px;
+    }
+    .table-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .table-scroll {
+        overflow-x: auto;
+        width: 100%;
+    }
+    .employee-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 850px;
+    }
+    .employee-table th, .employee-table td {
+        padding: 14px 18px;
+        text-align: left;
+        border-bottom: 1px solid var(--line);
+        font-size: 13px;
+    }
+    .employee-table th {
+        background: var(--cream);
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+    .employee-table tbody tr:hover td {
+        background: #faf9f5;
+    }
+    .employee-id {
+        font-family: inherit;
+        font-weight: 600;
+    }
+    .role {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        background: var(--cream);
+        color: var(--ink);
+    }
+    .status {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .status.online {
+        background: var(--cream);
+        color: var(--ink);
+    }
+    .status.offline {
+        background: var(--cream);
+        color: var(--muted);
+    }
+    .empty {
+        padding: 45px 20px;
+        text-align: center;
+        color: var(--muted);
+    }
+    .empty h3 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: var(--ink);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="employee-page">
+    <div class="page-header">
+        <div>
+            <h1>Employees</h1>
+            <p class="muted">Manage your company's team members, roles, and access.</p>
+        </div>
+
+        <a href="{% url 'create_employee' %}" class="button" data-rf-popup="{% url 'create_employee' %}" data-rf-title="Add Employee" data-rf-width="780" data-rf-height="270">
+            + Add Employee
+        </a>
+    </div>
+
+    <div class="table-card">
+        <div class="table-scroll">
+            {% if employees %}
+                <table class="employee-table">
+                    <thead>
+                        <tr>
+                            <th>Employee ID</th>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Joining Date</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for employee in employees %}
+                            <tr>
+                                <td>
+                                    <span class="employee-id">
+                                        {{ employee.employee_id }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <strong>{{ employee.first_name }} {{ employee.last_name }}</strong>
+                                </td>
+
+                                <td>
+                                    <span class="role">
+                                        {{ employee.get_role_display }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {{ employee.joining_date }}
+                                </td>
+
+                                <td>
+                                    {{ employee.user.email }}
+                                </td>
+
+                                <td>
+                                    {% if employee.is_online %}
+                                        <span class="status online">
+                                            🟢 Active
+                                        </span>
+                                    {% else %}
+                                        <span class="status offline">
+                                            ⚪ Offline
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    <a href="{% url 'edit_employee' employee.pk %}"
+                                       class="button secondary"
+                                       style="padding: 6px 12px; font-size: 11px;"
+                                       data-rf-popup="{% url 'edit_employee' employee.pk %}"
+                                       data-rf-title="Edit Employee &mdash; {{ employee.first_name }} {{ employee.last_name }}"
+                                       data-rf-width="720"
+                                       data-rf-height="270">
+                                        Edit
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="empty">
+                    <h3>No employees yet</h3>
+                    <p>Add your first employee to get started.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

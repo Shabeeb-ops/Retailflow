@@ -1,0 +1,522 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Admin dashboard | RetailFlow{% endblock %}
+{% block active_nav %}dashboard{% endblock %}
+
+{% block extra_head %}
+<style>
+/* Dashboard specific styles */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 17px;
+}
+.kicker {
+    margin-bottom: 5px;
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+.page-header h1 {
+    font-size: 25px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+}
+.page-header p {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+.date-box {
+    border: 1px solid var(--ink);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+.actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 13px;
+}
+.stat-title {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+.stat-value {
+    margin-top: 9px;
+    font-size: 25px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+.stat-change {
+    margin-top: 7px;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--muted);
+    line-height: 1.5;
+}
+.finance-note {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 8px;
+}
+.erp-strip {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    background: var(--cream);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    margin-bottom: 16px;
+}
+.erp-strip a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 13px 17px;
+    border-right: 1px solid var(--line);
+    text-decoration: none;
+    color: var(--ink);
+    font-size: 11px;
+    gap: 8px;
+    transition: background 0.15s;
+}
+.erp-strip a:last-child {
+    border: 0;
+}
+.erp-strip a:hover {
+    background: #eae8e1;
+}
+.erp-strip strong {
+    font-size: 17px;
+}
+.erp-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(260px, 1fr);
+    gap: 14px;
+    margin-bottom: 14px;
+}
+.erp-bottom {
+    display: grid;
+    grid-template-columns: minmax(0, 1.7fr) minmax(260px, 1fr);
+    gap: 14px;
+}
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+.card-header h3 {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+.card-header a {
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 600;
+}
+.card-header a:hover {
+    text-decoration: underline;
+}
+.chart-total {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 4px 0 12px;
+}
+.chart-total strong {
+    font-size: 24px;
+}
+.chart-total span {
+    font-size: 10px;
+    color: var(--muted);
+}
+.trend {
+    height: 116px;
+    display: flex;
+    gap: 10px;
+}
+.axis {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 9px;
+    color: var(--muted);
+    padding-bottom: 18px;
+}
+.line-plot {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+.line-plot svg {
+    display: block;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    overflow: visible;
+}
+.sales-line {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+}
+.line-grid {
+    stroke: var(--line);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+}
+.line-labels {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 6px;
+    font-size: 9px;
+    color: var(--muted);
+}
+.line-labels span {
+    width: 28px;
+    text-align: center;
+}
+.activity-empty {
+    height: 116px;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    font-size: 12px;
+    background: var(--cream);
+    border-radius: 8px;
+    text-align: center;
+    padding: 15px;
+}
+.attention {
+    background: var(--cream);
+}
+.alert-row {
+    padding: 10px 0;
+    text-decoration: none;
+    color: var(--ink);
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 12px;
+    align-items: center;
+}
+.alert-row strong {
+    display: block;
+    font-size: 11px;
+    margin-bottom: 3px;
+}
+.alert-row small {
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.5;
+}
+.pill {
+    border: 1px solid var(--line);
+    background: var(--bg);
+    padding: 5px 8px;
+    border-radius: 20px;
+    font-size: 9px;
+    white-space: nowrap;
+}
+.empty-note {
+    font-size: 12px;
+    color: var(--muted);
+    padding: 24px 0;
+    line-height: 1.6;
+}
+.table-wrapper {
+    overflow-x: auto;
+    max-width: 100%;
+}
+.table-wrapper table {
+    width: 100%;
+}
+.table-wrapper th {
+    padding: 7px;
+    font-size: 9px;
+    border-bottom: 1px solid var(--line);
+}
+.table-wrapper td {
+    padding: 10px 7px;
+    font-size: 11px;
+    overflow-wrap: anywhere;
+}
+.table-wrapper td a {
+    color: var(--ink);
+    text-decoration: none;
+}
+.table-wrapper td a:hover {
+    text-decoration: underline;
+}
+.numeric {
+    text-align: right;
+}
+.metric-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-top: 1px solid var(--line);
+    font-size: 11px;
+}
+.metric-row strong {
+    font-weight: 600;
+}
+.quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+}
+.quick-actions a {
+    font-size: 10px;
+    padding: 8px 10px;
+}
+.footer-note {
+    margin-top: 16px;
+    font-size: 10px;
+    color: var(--muted);
+    line-height: 1.7;
+}
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+@media (min-width: 1200px) and (min-height: 850px) {
+    .trend { height: 160px; }
+    .alert-row { padding: 13px 0; }
+    .table-wrapper td { padding: 14px 7px; }
+}
+@media (max-width: 1100px) {
+    .erp-main, .erp-bottom { grid-template-columns: minmax(0, 1.4fr) minmax(230px, 1fr); }
+    .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .erp-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .erp-strip a:nth-child(2) { border-right: 0; }
+}
+@media (max-width: 800px) {
+    .erp-main, .erp-bottom { grid-template-columns: 1fr; }
+    .page-header { align-items: flex-start; flex-direction: column; }
+    .actions { width: auto; }
+    .erp-strip a { padding: 12px; }
+}
+@media (max-width: 420px) {
+    .stats { gap: 8px; }
+    .stat-value { font-size: 23px; }
+    .erp-strip { grid-template-columns: 1fr; }
+    .erp-strip a { border-right: 0; border-bottom: 1px solid var(--line); }
+    .date-box { padding: 8px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <div class="kicker">Administrator workspace &middot; Company-wide overview</div>
+        <h1>Admin dashboard</h1>
+        <p>Monitor business performance, oversee your team, and manage every branch.</p>
+    </div>
+    <div class="actions">
+        <span class="date-box">{{ today|date:"d M Y" }}</span>
+        <a class="button" href="{% url 'product_list' %}">Manage products &rarr;</a>
+    </div>
+</div>
+
+<div class="stats">
+    <article class="card">
+        <div class="stat-title">Today's sales</div>
+        <div class="stat-value">&mdash;</div>
+        <div class="finance-note">Not available &middot; Sales module</div>
+    </article>
+    <article class="card">
+        <div class="stat-title">Receivables</div>
+        <div class="stat-value">&mdash;</div>
+        <div class="finance-note">Not available &middot; Customer accounts</div>
+    </article>
+    <article class="card">
+        <div class="stat-title">Payables</div>
+        <div class="stat-value">&mdash;</div>
+        <div class="finance-note">Not available &middot; Supplier accounts</div>
+    </article>
+    <article class="card">
+        <div class="stat-title">Today's expenses</div>
+        <div class="stat-value">&mdash;</div>
+        <div class="finance-note">Not available &middot; Expenses module</div>
+    </article>
+</div>
+
+<div class="erp-strip">
+    <a href="{% url 'product_list' %}"><span>Active products</span><strong>{{ total_products }} &rarr;</strong></a>
+    <a href="{% url 'stock_movement' %}"><span>Stock units</span><strong>{{ stock_units }} &rarr;</strong></a>
+    <a href="{% url 'employee_list' %}"><span>Employees</span><strong>{{ employee_count }} &rarr;</strong></a>
+    <a href="{% url 'branch_list' %}"><span>Active branches</span><strong>{{ branch_count }} &rarr;</strong></a>
+</div>
+
+<div class="erp-main">
+    <article class="card">
+        <div class="card-header">
+            <h3>Stock activity</h3>
+            <a href="{% url 'stock_movement' %}">Inventory details &rarr;</a>
+        </div>
+        <div class="chart-total">
+            <strong>{{ chart_total }} units</strong>
+            <span>{{ chart_start|date:"d M" }}&ndash;{{ today|date:"d M" }} &middot; All movement types</span>
+        </div>
+        {% if chart_has_data %}
+            <div class="trend" role="img" aria-label="Daily recorded stock movement quantities. Values are listed in the table following this chart.">
+                <div class="axis">
+                    <span>{{ chart_max }}</span>
+                    <span>{{ chart_mid|floatformat:"-1" }}</span>
+                    <span>0</span>
+                </div>
+                <div class="line-plot">
+                    <svg viewBox="0 0 580 100" preserveAspectRatio="none" aria-hidden="true">
+                        <path class="line-grid" d="M14 0H566 M14 50H566 M14 100H566"/>
+                        <polyline class="sales-line" points="{{ chart_points }}"/>
+                    </svg>
+                    <div class="line-labels">
+                        {% for day in chart_days %}
+                            <span>{{ day.label }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <table class="sr-only">
+                <caption>Recorded stock movement quantities in the last seven days</caption>
+                <thead>
+                    <tr><th>Date</th><th>Units</th></tr>
+                </thead>
+                <tbody>
+                    {% for day in chart_days %}
+                        <tr><td>{{ day.date|date:"d M Y" }}</td><td>{{ day.value }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="activity-empty">No stock movements recorded in the last seven days.</div>
+        {% endif %}
+        <p class="finance-note">Movement quantities include stock in, stock out, damage, and adjustments; this is not a stock balance.</p>
+    </article>
+
+    <article class="card attention">
+        <div class="card-header">
+            <h3>Needs your attention</h3>
+            <span class="pill">{{ low_stock_count }} low &middot; {{ out_of_stock_count }} empty</span>
+        </div>
+        {% for product in stock_alerts %}
+            <a class="alert-row" href="{% url 'product_list' %}?q={{ product.sku|urlencode }}">
+                <div>
+                    <strong>{{ product.name }}</strong>
+                    <small>{{ product.stock }} units left &middot; minimum {{ product.low_stock_threshold }}</small>
+                </div>
+                <span class="pill">{% if product.stock == 0 %}Out of stock{% else %}Low stock{% endif %} &rarr;</span>
+            </a>
+        {% empty %}
+            <p class="empty-note">
+                {% if total_products %}
+                    All active products are above their stock thresholds.
+                {% else %}
+                    Add your first product to start tracking stock alerts.
+                {% endif %}
+            </p>
+        {% endfor %}
+        <a class="card-header" style="font-size:11px;margin-top:12px" href="{% url 'product_list' %}">View products &rarr;</a>
+    </article>
+</div>
+
+<div class="erp-bottom">
+    <article class="card">
+        <div class="card-header">
+            <h3>Recent stock movements</h3>
+            <a href="{% url 'stock_movement' %}">Manage stock &rarr;</a>
+        </div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Movement</th>
+                        <th class="numeric">Units</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for movement in recent_movements %}
+                        <tr>
+                            <td><a href="{% url 'product_list' %}?q={{ movement.inventory.product.sku|urlencode }}">{{ movement.inventory.product.name }}</a></td>
+                            <td>{{ movement.get_movement_type_display }}</td>
+                            <td class="numeric">{{ movement.quantity }}</td>
+                            <td>{{ movement.created_at|date:"d M, H:i" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr class="empty-row">
+                            <td colspan="4">No stock movements recorded yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+
+    <article class="card">
+        <div class="card-header">
+            <h3>Admin controls</h3>
+            <a href="{% url 'branch_list' %}">Branches &rarr;</a>
+        </div>
+        <div class="metric-row">
+            <span>Inventory purchase value</span>
+            <strong>{{ company.currency }} {{ stock_value|floatformat:2 }}</strong>
+        </div>
+        <div class="metric-row">
+            <span>Damaged units</span>
+            <strong>{{ damaged_units }}</strong>
+        </div>
+        <div class="metric-row">
+            <span>Employees online</span>
+            <strong>{{ online_count }} / {{ employee_count }}</strong>
+        </div>
+        <div class="quick-actions">
+            <a class="button secondary" href="{% url 'branch_list' %}">Branches</a>
+            <a class="button secondary" href="{% url 'employee_list' %}">Employees</a>
+            <a class="button secondary" href="{% url 'product_list' %}">Products</a>
+        </div>
+    </article>
+</div>
+
+<p class="footer-note">Company-wide data &middot; Stock totals cover active products. Sales and finance summaries will be available when those modules are connected.</p>
+{% endblock %}

@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sign Up | RetailFlow</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        :root {
+            --bg: #f4f3ee;
+            --card: #ffffff;
+            --ink: #0d0d0d;
+            --muted: #6d6b63;
+            --line: #dedbd0;
+            --blue: #2f6bff;
+            --blue-dark: #1d4fd8;
+            --danger: #d6336c;
+        }
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 32px 16px;
+
+            font-family:
+                'Inter',
+                system-ui,
+                -apple-system,
+                'Segoe UI',
+                sans-serif;
+
+            background: var(--bg);
+            color: var(--ink);
+
+            -webkit-font-smoothing: antialiased;
+        }
+
+
+        .signup-box {
+            width: 100%;
+            max-width: 400px;
+        }
+
+
+        /* =========================
+           LOGO
+        ========================= */
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            gap: 10px;
+
+            margin-bottom: 24px;
+
+            font-size: 20px;
+            font-weight: 700;
+
+            letter-spacing: -0.01em;
+        }
+
+
+        .logo-mark {
+            width: 30px;
+            height: 30px;
+
+            border-radius: 8px;
+
+            background: var(--ink);
+
+            display: grid;
+            place-items: center;
+        }
+
+
+        .logo-mark svg {
+            width: 17px;
+            height: 17px;
+
+            fill: none;
+            stroke: #fff;
+
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+
+        /* =========================
+           CARD
+        ========================= */
+
+        .card {
+            background: var(--card);
+
+            border: 1px solid var(--line);
+
+            border-radius: 12px;
+
+            padding: 32px 28px;
+
+            box-shadow:
+                0 1px 2px rgba(0, 0, 0, 0.04);
+        }
+
+
+        h1 {
+            font-size: 20px;
+            font-weight: 600;
+
+            text-align: center;
+        }
+
+
+        .subtitle {
+            margin: 6px 0 24px;
+
+            font-size: 14px;
+
+            text-align: center;
+
+            color: var(--muted);
+        }
+
+
+        /* =========================
+           FORM ERRORS
+        ========================= */
+
+        .messages {
+            list-style: none;
+
+            margin-bottom: 16px;
+        }
+
+
+        .messages li {
+            padding: 10px 12px;
+
+            border-radius: 8px;
+
+            background: #fdecf2;
+
+            color: var(--danger);
+
+            font-size: 13px;
+
+            margin-bottom: 6px;
+        }
+
+
+        .field-error {
+            margin-top: 6px;
+
+            font-size: 12px;
+
+            color: var(--danger);
+        }
+
+
+        .field-error ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+
+        /* =========================
+           FIELDS
+        ========================= */
+
+        .row {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 12px;
+        }
+
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+
+        label {
+            display: block;
+
+            margin-bottom: 6px;
+
+            font-size: 13px;
+
+            font-weight: 500;
+        }
+
+
+        label span {
+            font-weight: 400;
+
+            color: var(--muted);
+        }
+
+
+        input {
+            width: 100%;
+
+            padding: 10px 12px;
+
+            border: 1px solid var(--line);
+
+            border-radius: 8px;
+
+            background: #fff;
+
+            font-family: inherit;
+
+            font-size: 14px;
+
+            color: var(--ink);
+
+            transition:
+                border-color 0.2s,
+                box-shadow 0.2s;
+        }
+
+
+        input::placeholder {
+            color: #a3a094;
+        }
+
+
+        input:focus {
+            outline: none;
+
+            border-color: var(--blue);
+
+            box-shadow:
+                0 0 0 3px rgba(47, 107, 255, 0.15);
+        }
+
+
+        /* =========================
+           BUTTON
+        ========================= */
+
+        .signup-button {
+            width: 100%;
+
+            margin-top: 8px;
+
+            padding: 11px 16px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            background: var(--ink);
+
+            color: #fff;
+
+            font-family: inherit;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: background 0.2s;
+        }
+
+
+        .signup-button:hover {
+            background: #2a2a2a;
+        }
+
+
+        .signup-button:focus-visible {
+            outline: 2px solid var(--ink);
+
+            outline-offset: 2px;
+        }
+
+
+        /* =========================
+           LOGIN LINK
+        ========================= */
+
+        .login-text {
+            margin-top: 20px;
+
+            font-size: 14px;
+
+            text-align: center;
+
+            color: var(--muted);
+        }
+
+
+        .login-text a {
+            font-weight: 600;
+
+            color: var(--blue);
+
+            text-decoration: none;
+        }
+
+
+        .login-text a:hover {
+            text-decoration: underline;
+        }
+
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 440px) {
+
+            .card {
+                padding: 24px 18px;
+            }
+
+            .row {
+                grid-template-columns: 1fr;
+
+                gap: 0;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="signup-box">
+
+
+    <!-- =========================
+         LOGO
+    ========================== -->
+
+    <div class="logo">
+
+        <div
+            class="logo-mark"
+            aria-hidden="true"
+        >
+
+            <svg viewBox="0 0 24 24">
+
+                <circle
+                    cx="9"
+                    cy="20"
+                    r="1.5"
+                />
+
+                <circle
+                    cx="18"
+                    cy="20"
+                    r="1.5"
+                />
+
+                <path
+                    d="M2 3h3l2.5 12h11L21 7H6"
+                />
+
+            </svg>
+
+        </div>
+
+        RetailFlow
+
+    </div>
+
+
+    <!-- =========================
+         CARD
+    ========================== -->
+
+    <div class="card">
+
+
+        <h1>
+            Create admin account
+        </h1>
+
+
+        <p class="subtitle">
+            Get started with RetailFlow
+        </p>
+
+
+        <!-- =========================
+             FORM-WIDE ERRORS
+        ========================== -->
+
+        {% if form.non_field_errors %}
+
+            <div class="messages">
+
+                {% for error in form.non_field_errors %}
+
+                    <li>
+                        {{ error }}
+                    </li>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- =========================
+             DJANGO FORM
+        ========================== -->
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+
+            <!-- FIRST NAME + LAST NAME -->
+
+            <div class="row">
+
+
+                <!-- FIRST NAME -->
+
+                <div class="form-group">
+
+                    <label for="first_name">
+                        First name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="first_name"
+                        name="first_name"
+                        placeholder="John"
+                        autocomplete="given-name"
+                        value="{{ form.first_name.value|default:'' }}"
+                        required
+                    >
+
+
+                    {% if form.first_name.errors %}
+
+                        <div class="field-error">
+
+                            {{ form.first_name.errors }}
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- LAST NAME -->
+
+                <div class="form-group">
+
+                    <label for="last_name">
+                        Last name
+                        <span>(optional)</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        id="last_name"
+                        name="last_name"
+                        placeholder="Doe"
+                        autocomplete="family-name"
+                        value="{{ form.last_name.value|default:'' }}"
+                    >
+
+
+                    {% if form.last_name.errors %}
+
+                        <div class="field-error">
+
+                            {{ form.last_name.errors }}
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+            </div>
+
+
+            <!-- EMAIL -->
+
+            <div class="form-group">
+
+                <label for="email">
+                    Email address
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="you@store.com"
+                    autocomplete="email"
+                    value="{{ form.email.value|default:'' }}"
+                    required
+                >
+
+
+                {% if form.email.errors %}
+
+                    <div class="field-error">
+
+                        {{ form.email.errors }}
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- PASSWORD -->
+
+            <div class="form-group">
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Create a strong password"
+                    autocomplete="new-password"
+                    required
+                >
+
+
+                {% if form.password.errors %}
+
+                    <div class="field-error">
+
+                        {{ form.password.errors }}
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- CONFIRM PASSWORD -->
+
+            <div class="form-group">
+
+                <label for="confirm_password">
+                    Confirm password
+                </label>
+
+                <input
+                    type="password"
+                    id="confirm_password"
+                    name="confirm_password"
+                    placeholder="Repeat your password"
+                    autocomplete="new-password"
+                    required
+                >
+
+
+                {% if form.confirm_password.errors %}
+
+                    <div class="field-error">
+
+                        {{ form.confirm_password.errors }}
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- SUBMIT -->
+
+            <button
+                type="submit"
+                class="signup-button"
+            >
+                Sign up
+            </button>
+
+
+        </form>
+
+
+        <!-- =========================
+             LOGIN
+        ========================== -->
+
+        <p class="login-text">
+
+            Already have an account?
+
+            <a href="{% url 'login' %}">
+                Login
+            </a>
+
+        </p>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

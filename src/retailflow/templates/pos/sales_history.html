@@ -1,0 +1,198 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}POS Sales History | RetailFlow{% endblock %}
+{% block active_nav %}pos_history{% endblock %}
+
+{% block extra_head %}
+<style>
+    .pos-history-page {
+        width: 100%;
+    }
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    .page-header h1 {
+        margin: 0 0 4px;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+    .page-header p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+    }
+    .history-filters {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+        background: #fff;
+        padding: 14px 18px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+    }
+    .history-filters input, .history-filters select {
+        padding: 8px 12px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font-size: 13px;
+    }
+    .table-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow-x: auto;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+    th, td {
+        padding: 12px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--line);
+    }
+    th {
+        background: var(--cream);
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    tr:hover td {
+        background: #faf9f5;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .status-badge.completed { background: #e6f4ea; color: #137333; }
+    .status-badge.cancelled { background: #fce8e6; color: #c5221f; }
+    .action-links {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    .action-links a {
+        color: var(--ink);
+        text-decoration: underline;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    .pagination-bar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-top: 18px;
+        font-size: 13px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pos-history-page">
+    <div class="page-header">
+        <div>
+            <h1>POS Sales History</h1>
+            <p>{{ company.company_name|default:"RetailFlow" }} &mdash; Audit all point-of-sale transactions</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+            <a href="{% url 'pos_reports' %}" class="button secondary">Sales Reports</a>
+            <a href="{% url 'pos' %}" class="button">← Back to POS Terminal</a>
+        </div>
+    </div>
+
+    <form method="get" class="history-filters">
+        <label for="search-q" style="font-weight:600;font-size:12px;">Search:</label>
+        <input type="search" id="search-q" name="q" placeholder="Sale No, Customer, Phone..." value="{{ search_query }}">
+
+        <label for="date-q" style="font-weight:600;font-size:12px;">Date:</label>
+        <input type="date" id="date-q" name="date" value="{{ date_filter }}">
+
+        <button type="submit" class="button">Filter</button>
+        {% if search_query or date_filter %}
+        <a href="{% url 'pos_sales_history' %}" class="button secondary">Reset</a>
+        {% endif %}
+    </form>
+
+    <div class="table-card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Sale Number</th>
+                    <th>Date & Time</th>
+                    <th>Customer</th>
+                    <th>Cashier</th>
+                    <th>Total Items</th>
+                    <th>Grand Total</th>
+                    <th>Payment Mode</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sale in page_obj %}
+                <tr>
+                    <td><strong>{{ sale.sale_number }}</strong></td>
+                    <td>{{ sale.created_at|date:"d M Y, h:i A" }}</td>
+                    <td>{{ sale.customer_name|default:"Walk-in" }}{% if sale.customer_phone %} <span style="color:#777;">({{ sale.customer_phone }})</span>{% endif %}</td>
+                    <td>{% if sale.cashier %}{% if sale.cashier.first_name %}{{ sale.cashier.first_name }}{% if sale.cashier.last_name %} {{ sale.cashier.last_name }}{% endif %}{% elif sale.cashier.user.email %}{{ sale.cashier.user.email }}{% else %}Staff{% endif %}{% else %}Staff{% endif %}</td>
+                    <td>{{ sale.items.count }} items</td>
+                    <td><strong>₹{{ sale.grand_total }}</strong></td>
+                    <td>
+                        {% for payment in sale.payments.all %}
+                            <span class="status-badge">{{ payment.get_payment_method_display }}</span>
+                        {% empty %}
+                            <span>—</span>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <span class="status-badge {% if sale.status == 'COMPLETED' %}completed{% else %}cancelled{% endif %}">
+                            {{ sale.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-links">
+                            <a href="{% url 'pos_sale_detail' sale.pk %}">Details</a>
+                            <a href="{% url 'pos_receipt_print' sale.pk %}" target="_blank">Print Receipt</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" style="text-align:center;padding:32px;color:var(--muted);">
+                        No sales records found matching your filters.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if page_obj.has_other_pages %}
+    <div class="pagination-bar">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if date_filter %}&date={{ date_filter }}{% endif %}" class="button secondary">&larr; Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if date_filter %}&date={{ date_filter }}{% endif %}" class="button secondary">Next &rarr;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

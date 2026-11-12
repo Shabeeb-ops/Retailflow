@@ -1,0 +1,6 @@
+{% extends "purchases/base.html" %}
+{% block purchase_content %}
+<div class="purchase-heading"><h1>Purchase payment history</h1></div>
+{% include "purchases/payments.html" with payments=page_obj %}
+{% include "purchases/pagination.html" %}
+{% endblock %}

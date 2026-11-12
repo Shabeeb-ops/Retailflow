@@ -1,0 +1,252 @@
+<div class="pos-receipt-wrapper {% if settings.paper_width == '58mm' %}width-58mm{% else %}width-80mm{% endif %}">
+    <style>
+        .pos-receipt-wrapper {
+            font-family: 'Courier New', Courier, monospace;
+            color: #000;
+            background: #fff;
+            padding: 16px 14px;
+            margin: 0 auto;
+            max-width: 380px;
+            box-sizing: border-box;
+            border: 1px dashed #ccc;
+            border-radius: 6px;
+            line-height: 1.35;
+            font-size: 13px;
+        }
+        .pos-receipt-wrapper.width-58mm {
+            max-width: 270px;
+            font-size: 11px;
+            padding: 10px 8px;
+        }
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 12px;
+            border-bottom: 1px dashed #000;
+            padding-bottom: 8px;
+        }
+        .receipt-store-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 0 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .width-58mm .receipt-store-name { font-size: 15px; }
+        .receipt-meta-line {
+            font-size: 11px;
+            color: #333;
+            margin: 2px 0;
+        }
+        .receipt-info {
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+        .width-58mm .receipt-info { font-size: 10px; }
+        .receipt-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 2px 0;
+        }
+        .receipt-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+        .width-58mm .receipt-table { font-size: 10px; }
+        .receipt-table th {
+            border-bottom: 1px dashed #000;
+            border-top: 1px dashed #000;
+            padding: 4px 0;
+            text-align: left;
+            font-weight: bold;
+        }
+        .receipt-table td {
+            padding: 4px 0;
+            vertical-align: top;
+        }
+        .receipt-table .num { text-align: right; }
+        .receipt-totals {
+            border-top: 1px dashed #000;
+            padding-top: 6px;
+            margin-top: 6px;
+        }
+        .receipt-total-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 3px 0;
+            font-size: 12px;
+        }
+        .receipt-total-row.grand {
+            font-size: 16px;
+            font-weight: bold;
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            padding: 6px 0;
+            margin: 6px 0;
+        }
+        .width-58mm .receipt-total-row.grand { font-size: 14px; }
+        .receipt-payment-info {
+            background: #f9f9f9;
+            padding: 6px 8px;
+            border-radius: 4px;
+            margin: 8px 0;
+            font-size: 11px;
+        }
+        .receipt-footer-note {
+            text-align: center;
+            font-size: 11px;
+            margin-top: 12px;
+            padding-top: 8px;
+            border-top: 1px dashed #000;
+        }
+        .receipt-actions-bar {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #ddd;
+        }
+        .btn-print {
+            background: #0d0d0d;
+            color: #fff;
+            padding: 9px 18px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            border: 0;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-print:hover { background: #333; }
+        .btn-close-receipt {
+            background: #e5e7eb;
+            color: #111;
+            padding: 9px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            border: 0;
+        }
+        .btn-close-receipt:hover { background: #d1d5db; }
+        @media print {
+            .receipt-actions-bar { display: none !important; }
+            .pos-receipt-wrapper {
+                border: 0 !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
+
+    <div class="receipt-header">
+        <div class="receipt-store-name">{{ company.company_name|default:"RetailFlow Store" }}</div>
+        {% if settings.receipt_header %}
+            <div class="receipt-meta-line">{{ settings.receipt_header|linebreaksbr }}</div>
+        {% endif %}
+        <div class="receipt-meta-line">TAX INVOICE / POS RECEIPT</div>
+    </div>
+
+    <div class="receipt-info">
+        <div class="receipt-info-row">
+            <span>Bill No:</span>
+            <strong>{{ sale.sale_number }}</strong>
+        </div>
+        <div class="receipt-info-row">
+            <span>Date:</span>
+            <span>{{ sale.created_at|date:"d M Y, h:i A" }}</span>
+        </div>
+        <div class="receipt-info-row">
+            <span>Cashier:</span>
+            <span>{% if sale.cashier %}{% if sale.cashier.first_name %}{{ sale.cashier.first_name }}{% if sale.cashier.last_name %} {{ sale.cashier.last_name }}{% endif %}{% elif sale.cashier.user.email %}{{ sale.cashier.user.email }}{% else %}Staff{% endif %}{% else %}Staff{% endif %}</span>
+        </div>
+        {% if sale.customer_name %}
+        <div class="receipt-info-row">
+            <span>Customer:</span>
+            <span>{{ sale.customer_name }}{% if sale.customer_phone %} ({{ sale.customer_phone }}){% endif %}</span>
+        </div>
+        {% endif %}
+    </div>
+
+    <table class="receipt-table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th class="num">Qty</th>
+                <th class="num">Rate</th>
+                <th class="num">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in sale.items.all %}
+            <tr>
+                <td>{{ item.product_name }}</td>
+                <td class="num">{{ item.quantity }}</td>
+                <td class="num">₹{{ item.unit_price }}</td>
+                <td class="num">₹{{ item.line_total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="receipt-totals">
+        <div class="receipt-total-row">
+            <span>Subtotal:</span>
+            <span>₹{{ sale.subtotal }}</span>
+        </div>
+        {% if sale.discount_amount > 0 %}
+        <div class="receipt-total-row">
+            <span>Discount:</span>
+            <span>-₹{{ sale.discount_amount }}</span>
+        </div>
+        {% endif %}
+        <div class="receipt-total-row grand">
+            <span>GRAND TOTAL:</span>
+            <span>₹{{ sale.grand_total }}</span>
+        </div>
+    </div>
+
+    {% if payment %}
+    <div class="receipt-payment-info">
+        <div class="receipt-info-row">
+            <span>Payment Mode:</span>
+            <strong>{{ payment.get_payment_method_display }}</strong>
+        </div>
+        {% if payment.payment_method == "CASH" %}
+        <div class="receipt-info-row">
+            <span>Amount Tendered:</span>
+            <span>₹{{ payment.amount_tendered|default:payment.amount }}</span>
+        </div>
+        <div class="receipt-info-row">
+            <span>Change Returned:</span>
+            <strong>₹{{ payment.change_due }}</strong>
+        </div>
+        {% elif payment.reference %}
+        <div class="receipt-info-row">
+            <span>Reference / Ref:</span>
+            <span>{{ payment.reference }}</span>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="receipt-footer-note">
+        {{ settings.receipt_footer|default:"Thank you for shopping with us! Please visit again."|linebreaksbr }}
+    </div>
+
+    <div class="receipt-actions-bar no-print">
+        <button type="button" class="btn-print" onclick="window.print()">
+            🖨️ Print Receipt
+        </button>
+        <button type="button" class="btn-close-receipt" onclick="if(window.RetailFlowPOS && RetailFlowPOS.closeReceiptModal){RetailFlowPOS.closeReceiptModal();}else{window.close();}">
+            Done / Next Sale
+        </button>
+    </div>
+</div>
+

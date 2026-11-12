@@ -1,0 +1,17 @@
+{% extends "purchases/base.html" %}
+{% block purchase_content %}
+<div class="purchase-heading"><h1>Internal purchase invoices</h1></div>
+<p class="purchase-muted">Generated from accepted goods. Verify each record against the supplier's actual bill before recording payments.</p>
+<div class="card purchase-table"><table><thead><tr><th>Internal number</th><th>Supplier</th><th>Supplier bill</th><th>Date</th><th>Total</th><th>Outstanding</th><th>Verification</th><th>Payment status</th></tr></thead><tbody>
+{% for invoice in page_obj %}<tr>
+    <td><a href="{% url 'purchase_invoice_detail' invoice.pk %}" data-rf-popup="{% url 'purchase_invoice_detail' invoice.pk %}" data-rf-title="Internal Purchase Invoice {{ invoice.number }}" data-rf-width="900" data-rf-height="480"><strong>{{ invoice.number }}</strong></a></td>
+    <td>{{ invoice.supplier_snapshot.name }}</td>
+    <td>{{ invoice.supplier_invoice_number|default:'Not entered' }}</td>
+    <td>{{ invoice.invoice_date }}</td>
+    <td>{{ invoice.currency }} {{ invoice.grand_total }}</td>
+    <td><strong>{{ invoice.currency }} {{ invoice.outstanding }}</strong></td>
+    <td><span class="status">{{ invoice.get_status_display }}</span></td>
+    <td><span class="status">{{ invoice.payment_status }}</span></td>
+</tr>{% empty %}<tr><td colspan="8">No purchase invoices yet.</td></tr>{% endfor %}
+</tbody></table></div>{% include "purchases/pagination.html" %}
+{% endblock %}

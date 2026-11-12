@@ -1,0 +1,219 @@
+<div class="logo">
+    <div class="logo-mark">
+        <svg class="icon">
+            <use href="#i-cart"/>
+        </svg>
+    </div>
+    <span class="logo-text">RetailFlow</span>
+</div>
+
+<div class="company-box">
+    <div class="company-name" title="{{ company.company_name|default:request.user.company.company_name }}">
+        {{ company.company_name|default:request.user.company.company_name|default:"RetailFlow" }}
+    </div>
+    <div class="company-role">
+        {% if request.user.employee %}
+            {{ request.user.employee.get_role_display }}
+        {% else %}
+            Administrator
+        {% endif %}
+    </div>
+</div>
+
+<nav class="menu">
+    {% if request.user.employee and request.user.employee.role == 'CASHIER' %}
+        <div class="menu-title">Cashier Navigation</div>
+
+        <!-- POS Terminal -->
+        <a href="{% url 'pos' %}"
+           class="menu-item {% if active_nav == 'pos' or request.resolver_match.url_name in 'pos,pos_terminal' %}active{% endif %}"
+           title="Open POS Terminal">
+            <svg class="icon">
+                <use href="#i-pos"/>
+            </svg>
+            <span>POS Terminal</span>
+        </a>
+
+        <!-- Sales History -->
+        <a href="{% url 'pos_sales_history' %}"
+           class="menu-item {% if active_nav == 'pos_history' or request.resolver_match.url_name in 'pos_sales_history,pos_sale_detail' %}active{% endif %}"
+           title="View Sales History">
+            <svg class="icon">
+                <use href="#i-sales"/>
+            </svg>
+            <span>Sales History</span>
+        </a>
+
+        <!-- Sales Reports -->
+        <a href="{% url 'pos_reports' %}"
+           class="menu-item {% if active_nav == 'pos_reports' or request.resolver_match.url_name == 'pos_reports' %}active{% endif %}"
+           title="View Sales Reports">
+            <svg class="icon">
+                <use href="#i-bars"/>
+            </svg>
+            <span>Sales Reports</span>
+        </a>
+
+        <div class="menu-title">Session</div>
+
+        <!-- Log out -->
+        <a class="menu-item" href="{% url 'employee_logout' %}">
+            <svg class="icon">
+                <use href="#i-logout"/>
+            </svg>
+            <span>Log out</span>
+        </a>
+    {% else %}
+        <div class="menu-title">Main Menu</div>
+
+    <!-- Dashboard -->
+    <a href="{% url 'dashboard_view' %}"
+       class="menu-item {% if active_nav == 'dashboard' or request.resolver_match.url_name == 'dashboard_view' %}active{% endif %}"
+       {% if active_nav == 'dashboard' or request.resolver_match.url_name == 'dashboard_view' %}aria-current="page"{% endif %}>
+        <svg class="icon">
+            <use href="#i-dash"/>
+        </svg>
+        <span>Dashboard</span>
+    </a>
+
+    <!-- POS Terminal -->
+    <a href="{% url 'pos' %}" target="_blank"
+       class="menu-item {% if active_nav == 'pos' %}active{% endif %}"
+       title="Open POS Terminal">
+        <svg class="icon">
+            <use href="#i-pos"/>
+        </svg>
+        <span>POS Terminal</span>
+    </a>
+
+    <!-- Sales History -->
+    <a href="{% url 'pos_sales_history' %}"
+       class="menu-item {% if active_nav == 'pos_history' %}active{% endif %}">
+        <svg class="icon">
+            <use href="#i-sales"/>
+        </svg>
+        <span>Sales History</span>
+    </a>
+
+    <!-- Products -->
+    <a href="{% url 'product_list' %}"
+       class="menu-item {% if active_nav == 'products' or request.resolver_match.url_name in 'product_list,add_category,import_products' or '/products/' in request.path %}active{% endif %}"
+       {% if active_nav == 'products' or request.resolver_match.url_name in 'product_list,add_category,import_products' or '/products/' in request.path %}aria-current="page"{% endif %}>
+        <svg class="icon">
+            <use href="#i-box"/>
+        </svg>
+        <span>Products</span>
+    </a>
+
+    <!-- Inventory -->
+    <a href="{% url 'stock_movement' %}"
+       class="menu-item {% if active_nav == 'inventory' or request.resolver_match.url_name == 'stock_movement' or '/inventory/' in request.path %}active{% endif %}"
+       {% if active_nav == 'inventory' or request.resolver_match.url_name == 'stock_movement' or '/inventory/' in request.path %}aria-current="page"{% endif %}>
+        <svg class="icon">
+            <use href="#i-layers"/>
+        </svg>
+        <span>Inventory</span>
+    </a>
+
+    <a href="{% url 'supplier_list' %}"
+       class="menu-item {% if active_nav == 'suppliers' %}active{% endif %}"
+       {% if active_nav == 'suppliers' %}aria-current="page"{% endif %}>
+        <svg class="icon"><use href="#i-bag"/></svg>
+        <span>Suppliers</span>
+    </a>
+
+    <!-- Customers (Soon) -->
+    <span class="menu-item unavailable" aria-disabled="true" title="This module is not available yet">
+        <svg class="icon">
+            <use href="#i-users"/>
+        </svg>
+        <span>Customers</span>
+        <small class="coming">Soon</small>
+    </span>
+
+    <!-- Purchases -->
+    <a href="{% url 'purchase_order_list' %}"
+       class="menu-item {% if active_nav == 'purchases' %}active{% endif %}"
+       {% if active_nav == 'purchases' %}aria-current="page"{% endif %}>
+        <svg class="icon">
+            <use href="#i-bag"/>
+        </svg>
+        <span>Purchases</span>
+    </a>
+
+    <!-- Returns (Soon) -->
+    <span class="menu-item unavailable" aria-disabled="true" title="This module is not available yet">
+        <svg class="icon">
+            <use href="#i-return"/>
+        </svg>
+        <span>Returns</span>
+        <small class="coming">Soon</small>
+    </span>
+
+    <!-- Employees -->
+    <a href="{% url 'employee_list' %}"
+       class="menu-item {% if active_nav == 'employees' or request.resolver_match.url_name in 'employee_list,create_employee' %}active{% endif %}"
+       {% if active_nav == 'employees' or request.resolver_match.url_name in 'employee_list,create_employee' %}aria-current="page"{% endif %}>
+        <svg class="icon">
+            <use href="#i-brief"/>
+        </svg>
+        <span>Employees</span>
+    </a>
+
+    <!-- Branches -->
+    <a href="{% url 'branch_list' %}"
+       class="menu-item {% if active_nav == 'branches' or request.resolver_match.url_name in 'branch_list,add_branch,edit_branch' or '/branches/' in request.path %}active{% endif %}"
+       {% if active_nav == 'branches' or request.resolver_match.url_name in 'branch_list,add_branch,edit_branch' or '/branches/' in request.path %}aria-current="page"{% endif %}>
+        <svg class="icon">
+            <use href="#i-building"/>
+        </svg>
+        <span>Branches</span>
+    </a>
+
+    <!-- Expenses (Soon) -->
+    <span class="menu-item unavailable" aria-disabled="true" title="This module is not available yet">
+        <svg class="icon">
+            <use href="#i-card"/>
+        </svg>
+        <span>Expenses</span>
+        <small class="coming">Soon</small>
+    </span>
+
+    <!-- Reports -->
+    <a href="{% url 'pos_reports' %}"
+       class="menu-item {% if active_nav == 'pos_reports' %}active{% endif %}">
+        <svg class="icon">
+            <use href="#i-bars"/>
+        </svg>
+        <span>POS Reports</span>
+    </a>
+
+    <div class="menu-title">Settings</div>
+
+    <!-- Company Settings (Soon) -->
+    <span class="menu-item unavailable" aria-disabled="true" title="This module is not available yet">
+        <svg class="icon">
+            <use href="#i-building"/>
+        </svg>
+        <span>Company Settings</span>
+        <small class="coming">Soon</small>
+    </span>
+
+    <!-- POS Settings -->
+    <a href="{% url 'pos_settings' %}"
+       class="menu-item {% if active_nav == 'pos_settings' %}active{% endif %}">
+        <svg class="icon">
+            <use href="#i-sliders"/>
+        </svg>
+        <span>POS Settings</span>
+    </a>
+
+    <!-- Log out -->
+    <a class="menu-item" href="{% url 'logout' %}">
+        <svg class="icon">
+            <use href="#i-logout"/>
+        </svg>
+        <span>Log out</span>
+    </a>
+    {% endif %}
+</nav>

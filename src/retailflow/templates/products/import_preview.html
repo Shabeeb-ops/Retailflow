@@ -1,0 +1,213 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Import Products | RetailFlow{% endblock %}
+{% block active_nav %}products{% endblock %}
+
+{% block extra_head %}
+<style>
+    .import-container {
+        max-width: 1200px;
+        margin: 10px auto;
+    }
+    .back-link {
+        display: inline-block;
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 16px;
+    }
+    .back-link:hover {
+        color: var(--ink);
+    }
+    .import-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 28px;
+        margin-bottom: 24px;
+    }
+    .import-card h1 {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 6px;
+        letter-spacing: -0.02em;
+    }
+    .muted {
+        color: var(--muted);
+        font-size: 13px;
+    }
+    .upload-form {
+        margin: 20px 0 10px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+    }
+    .upload-form input[type="file"] {
+        padding: 8px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+        font-size: 13px;
+    }
+    .preview-summary {
+        margin: 24px 0 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    .preview-summary h2 {
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0;
+    }
+    .preview-stats {
+        font-size: 13px;
+    }
+    .table-wrap {
+        overflow-x: auto;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    .preview-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .preview-table th, .preview-table td {
+        padding: 10px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--line);
+        font-size: 13px;
+    }
+    .preview-table th {
+        background: var(--cream);
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+    .error-tag {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: var(--cream);
+        color: var(--ink);
+        border: 1px solid var(--ink);
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .valid-tag {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 4px;
+        background: var(--cream);
+        color: var(--ink);
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .confirm-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="import-container">
+    <a href="{% url 'product_list' %}" class="back-link">
+        &larr; Back to Products
+    </a>
+
+    <div class="import-card">
+        <h1>Import Products</h1>
+        <p class="muted">
+            Upload an Excel (.xlsx) or CSV file. Review the rows before importing.
+        </p>
+
+        <form method="post" enctype="multipart/form-data" class="upload-form">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="preview">
+            <input type="file" name="file" accept=".xlsx,.csv" required>
+            <button type="submit" class="button">
+                Preview File
+            </button>
+        </form>
+
+        {% if preview_done %}
+            <div class="preview-summary">
+                <div>
+                    <h2>Import Preview</h2>
+                    <p class="muted preview-stats">
+                        Valid rows: <strong>{{ valid_count }}</strong> &middot;
+                        Rows with errors: <strong>{{ error_count }}</strong>
+                    </p>
+                </div>
+
+                {% if valid_count %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="confirm">
+                        <button class="button" type="submit">
+                            Import {{ valid_count }} Valid Products
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+
+            <div class="table-wrap">
+                <table class="preview-table">
+                    <thead>
+                        <tr>
+                            <th>File Row</th>
+                            <th>Product</th>
+                            <th>SKU</th>
+                            <th>Category</th>
+                            <th>Purchase Price</th>
+                            <th>Selling Price</th>
+                            <th>Validation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in preview_rows %}
+                            <tr>
+                                <td>{{ item.row_number }}</td>
+                                <td><strong>{{ item.data.name|default:"-" }}</strong></td>
+                                <td>{{ item.data.sku|default:"-" }}</td>
+                                <td>{{ item.data.category|default:"-" }}</td>
+                                <td>{{ item.data.purchase_price|default:"-" }}</td>
+                                <td>{{ item.data.selling_price|default:"-" }}</td>
+                                <td>
+                                    {% if item.error %}
+                                        <span class="error-tag">{{ item.error }}</span>
+                                    {% else %}
+                                        <span class="valid-tag">&check; Valid</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if valid_count %}
+                <div class="confirm-actions">
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="confirm">
+                        <button class="button" type="submit">
+                            Confirm Import ({{ valid_count }} Products)
+                        </button>
+                    </form>
+                    <a class="button secondary" href="{% url 'product_list' %}">Cancel</a>
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

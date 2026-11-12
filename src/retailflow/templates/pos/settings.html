@@ -1,0 +1,197 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}POS Settings | RetailFlow{% endblock %}
+{% block active_nav %}pos_settings{% endblock %}
+
+{% block extra_head %}
+<style>
+    .pos-settings-page {
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+    }
+    .page-header h1 {
+        margin: 0 0 4px;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+    .settings-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 24px;
+    }
+    .form-section {
+        margin-bottom: 24px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--line);
+    }
+    .form-section:last-child {
+        border-bottom: 0;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
+    .form-section h3 {
+        margin: 0 0 14px;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+    }
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+    .field-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 12px;
+    }
+    .field-group label {
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 6px;
+    }
+    .field-group input, .field-group select, .field-group textarea {
+        padding: 9px 12px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font-size: 13px;
+        background: #fff;
+        box-sizing: border-box;
+    }
+    .checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 0;
+    }
+    .checkbox-row input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+    }
+    .checkbox-row label {
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+    .helptext {
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 4px;
+    }
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 24px;
+    }
+    @media (max-width: 650px) {
+        .grid-2 { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pos-settings-page">
+    <div class="page-header">
+        <div>
+            <h1>POS Configuration</h1>
+            <p style="margin:0;color:var(--muted);font-size:13px;">Manage register display preferences, thermal receipt formats, and checkout options.</p>
+        </div>
+        <a href="{% url 'pos' %}" target="_blank" class="button">+ Open POS Terminal</a>
+    </div>
+
+    <form method="post" class="settings-card">
+        {% csrf_token %}
+
+        <!-- Display & Layout -->
+        <div class="form-section">
+            <h3>Terminal Display & Format</h3>
+            <div class="grid-2">
+                <div class="field-group">
+                    <label for="{{ form.display_mode.id_for_label }}">Catalog Display Mode</label>
+                    {{ form.display_mode }}
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.paper_width.id_for_label }}">Thermal Receipt Width</label>
+                    {{ form.paper_width }}
+                    <span class="helptext">Select 58mm for small mobile thermal printers or 80mm for standard counter printers.</span>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-top:10px;">
+                <div class="checkbox-row">
+                    {{ form.enable_images }}
+                    <label for="{{ form.enable_images.id_for_label }}">Show Product Images</label>
+                </div>
+                <div class="checkbox-row">
+                    {{ form.show_stock }}
+                    <label for="{{ form.show_stock.id_for_label }}">Display Stock Count on Cards</label>
+                </div>
+                <div class="checkbox-row">
+                    {{ form.enable_barcode }}
+                    <label for="{{ form.enable_barcode.id_for_label }}">Enable Barcode Scanner / Instant Search</label>
+                </div>
+                <div class="checkbox-row">
+                    {{ form.enable_discount }}
+                    <label for="{{ form.enable_discount.id_for_label }}">Allow Manual Discounts at POS</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment & Discounts -->
+        <div class="form-section">
+            <h3>Accepted Payment Methods & Discounts</h3>
+            <div class="grid-2" style="margin-bottom:14px;">
+                <div class="checkbox-row">
+                    {{ form.enable_cash }}
+                    <label for="{{ form.enable_cash.id_for_label }}">Enable Cash (Auto change calculation)</label>
+                </div>
+                <div class="checkbox-row">
+                    {{ form.enable_upi }}
+                    <label for="{{ form.enable_upi.id_for_label }}">Enable UPI (QR / PhonePe / GPay)</label>
+                </div>
+                <div class="checkbox-row">
+                    {{ form.enable_card }}
+                    <label for="{{ form.enable_card.id_for_label }}">Enable Debit/Credit Card (POS Machine)</label>
+                </div>
+                <div class="field-group">
+                    <label for="{{ form.max_discount_percent.id_for_label }}">Max Allowed Discount (%)</label>
+                    {{ form.max_discount_percent }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Receipt Branding -->
+        <div class="form-section">
+            <h3>Thermal Receipt Header & Footer</h3>
+            <div class="field-group">
+                <label for="{{ form.receipt_header.id_for_label }}">Receipt Header Note (Optional)</label>
+                {{ form.receipt_header }}
+                <span class="helptext">Store branch, address, GSTIN or greetings printed below company name.</span>
+            </div>
+            <div class="field-group">
+                <label for="{{ form.receipt_footer.id_for_label }}">Receipt Footer Note</label>
+                {{ form.receipt_footer }}
+                <span class="helptext">Printed at the very bottom of every customer receipt.</span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="button">Save Settings</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

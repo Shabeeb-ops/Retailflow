@@ -1,0 +1,260 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Branch Management | RetailFlow{% endblock %}
+{% block active_nav %}branches{% endblock %}
+
+{% block extra_head %}
+<style>
+    .branch-page {
+        width: 100%;
+    }
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+    }
+    .page-header h1 {
+        margin: 0 0 6px;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+    .subtitle {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+    }
+    .summary {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 22px;
+    }
+    .summary-card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+    }
+    .summary-card h3 {
+        margin: 0 0 8px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+    .summary-card strong {
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+    .table-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .table-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--line);
+    }
+    .table-header h2 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+    }
+    .table-scroll {
+        overflow-x: auto;
+        width: 100%;
+    }
+    .branch-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .branch-table th, .branch-table td {
+        padding: 14px 18px;
+        text-align: left;
+        border-bottom: 1px solid var(--line);
+    }
+    .branch-table th {
+        background: var(--cream);
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+    .branch-table td {
+        font-size: 13px;
+    }
+    .branch-table tbody tr:hover td {
+        background: #faf9f5;
+    }
+    .branch-name {
+        font-weight: 600;
+    }
+    .branch-code {
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 4px;
+    }
+    .status {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .status.active {
+        background: var(--cream);
+        color: var(--ink);
+    }
+    .status.inactive {
+        background: var(--cream);
+        color: var(--muted);
+    }
+    .empty {
+        padding: 40px 20px;
+        text-align: center;
+        color: var(--muted);
+        font-size: 13px;
+    }
+    @media (max-width: 700px) {
+        .summary {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="branch-page">
+    <div class="page-header">
+        <div>
+            <h1>Branch Management</h1>
+            <p class="subtitle">
+                {{ company.company_name|default:"RetailFlow" }} &mdash; Manage your stores and warehouses
+            </p>
+        </div>
+
+        <a href="{% url 'add_branch' %}" class="button" data-rf-popup="{% url 'add_branch' %}" data-rf-title="Add New Branch" data-rf-width="840" data-rf-height="320">
+            + Add Branch
+        </a>
+    </div>
+
+    <div class="summary">
+        <div class="summary-card">
+            <h3>Total Branches</h3>
+            <strong>{{ branches|length }}</strong>
+        </div>
+
+        <div class="summary-card">
+            <h3>Active Branches</h3>
+            <strong id="activeCount">0</strong>
+        </div>
+
+        <div class="summary-card">
+            <h3>Warehouses</h3>
+            <strong id="warehouseCount">0</strong>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <div class="table-header">
+            <h2>All Branches</h2>
+        </div>
+
+        <div class="table-scroll">
+            <table class="branch-table">
+                <thead>
+                    <tr>
+                        <th>Branch</th>
+                        <th>Type</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                {% for branch in branches %}
+                    <tr>
+                        <td>
+                            <div class="branch-name">
+                                {{ branch.name }}
+                            </div>
+                            <div class="branch-code">
+                                {{ branch.code }}
+                            </div>
+                        </td>
+
+                        <td>
+                            {{ branch.get_branch_type_display }}
+                        </td>
+
+                        <td>
+                            {{ branch.phone|default:"—" }}
+                        </td>
+
+                        <td>
+                            {{ branch.email|default:"—" }}
+                        </td>
+
+                        <td>
+                            {% if branch.is_active %}
+                                <span class="status active">
+                                    Active
+                                </span>
+                            {% else %}
+                                <span class="status inactive">
+                                    Inactive
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            <a href="{% url 'edit_branch' branch.pk %}"
+                               data-rf-popup="{% url 'edit_branch' branch.pk %}"
+                               data-rf-title="Edit Branch &mdash; {{ branch.name }}"
+                               data-rf-width="840"
+                               data-rf-height="320"
+                               class="button secondary"
+                               style="padding: 6px 12px; font-size: 11px;">
+                                Edit
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="6" class="empty">
+                            No branches found. Click "+ Add Branch" to create your first store.
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const activeEl = document.getElementById("activeCount");
+    const warehouseEl = document.getElementById("warehouseCount");
+
+    if (activeEl) {
+        activeEl.textContent = document.querySelectorAll("tbody .status.active").length;
+    }
+
+    if (warehouseEl) {
+        warehouseEl.textContent = [...document.querySelectorAll("tbody tr")].filter(row => {
+            const typeCell = row.cells[1];
+            return typeCell && typeCell.textContent.trim() === "Warehouse";
+        }).length;
+    }
+</script>
+{% endblock %}

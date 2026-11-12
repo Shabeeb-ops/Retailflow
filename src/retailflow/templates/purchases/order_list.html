@@ -1,0 +1,25 @@
+{% extends "purchases/base.html" %}
+{% block purchase_content %}
+<div class="purchase-heading">
+    <h1>Purchase orders</h1>
+    <a class="button" href="{% url 'add_purchase_order' %}" data-rf-popup="{% url 'add_purchase_order' %}" data-rf-title="Create Purchase Order" data-rf-width="940" data-rf-height="460">Create purchase order</a>
+</div>
+<form method="get" class="purchase-filters">
+    <label for="q">Search</label><input id="q" name="q" value="{{ search }}" type="search">
+    <label for="status">Status</label><select id="status" name="status"><option value="">All</option>{% for value, label in statuses %}<option value="{{ value }}" {% if value == selected_status %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+    <label for="from">From</label><input id="from" name="from" type="date" value="{{ request.GET.from }}"><label for="to">To</label><input id="to" name="to" type="date" value="{{ request.GET.to }}"><button class="button" type="submit">Filter</button><a href="{% url 'purchase_order_list' %}" class="button secondary">Reset</a>
+</form>
+<div class="card purchase-table"><table>
+    <thead><tr><th>PO number</th><th>Supplier</th><th>Order date</th><th>Total ({{ company.currency }})</th><th>Status</th></tr></thead>
+    <tbody>
+    {% for order in page_obj %}<tr>
+        <td><a href="{% url 'purchase_order_detail' order.pk %}" data-rf-popup="{% url 'purchase_order_detail' order.pk %}" data-rf-title="Purchase Order {{ order.number }}" data-rf-width="900" data-rf-height="420"><strong>{{ order.number }}</strong></a></td>
+        <td>{{ order.supplier.name }}</td>
+        <td>{{ order.order_date }}</td>
+        <td>{{ order.totals.line_total }}</td>
+        <td><span class="status">{{ order.get_status_display }}</span></td>
+    </tr>{% empty %}<tr><td colspan="5">No purchase orders found.</td></tr>{% endfor %}
+    </tbody>
+</table></div>
+{% include "purchases/pagination.html" %}
+{% endblock %}

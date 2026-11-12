@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>RetailFlow Inventory</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background: var(--cream);
+            color: var(--ink);
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+
+        .sidebar {
+            width: 230px;
+            background: var(--ink);
+            color: white;
+            padding: 24px 16px;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 35px;
+            padding-left: 10px;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .menu a {
+            text-decoration: none;
+            color: var(--muted);
+            padding: 13px 14px;
+            border-radius: 8px;
+            display: block;
+        }
+
+        .menu a:hover,
+        .menu a.active {
+            background: var(--ink);
+            color: white;
+        }
+
+        .logout {
+            margin-top: 30px;
+        }
+
+        /* Main */
+
+        .main {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+        }
+
+        .employee {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        /* Cards */
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+        }
+
+        .card-title {
+            color: var(--muted);
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        /* Inventory */
+
+        .inventory-section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+        }
+
+        .inventory-section h2 {
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 14px;
+            text-align: left;
+            border-bottom: 1px solid var(--line);
+        }
+
+        th {
+            font-size: 14px;
+            color: var(--muted);
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .normal {
+            background: var(--cream);
+            color: var(--ink);
+        }
+
+        .low {
+            background: var(--cream);
+            color: var(--ink);
+        }
+
+        .out {
+            background: var(--cream);
+            color: var(--ink);
+        }
+
+        @media (max-width: 900px) {
+
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+    </style>
+
+    {% include "shared/dashboard_theme.html" %}
+</head>
+
+<body class="theme-inventory">
+
+<div class="layout">
+
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            RetailFlow
+        </div>
+
+        <nav class="menu">
+
+            <a href="#" class="active">
+                📊 Inventory
+            </a>
+
+            <a href="#">
+                📦 Products
+            </a>
+
+            <a href="#">
+                ⬆️ Stock In
+            </a>
+
+            <a href="#">
+                ⬇️ Stock Out
+            </a>
+
+            <a href="#">
+                ⚠️ Low Stock
+            </a>
+
+            <a href="#">
+                💥 Damaged Stock
+            </a>
+
+            <a
+                href="{% url 'employee_logout' %}"
+                class="logout"
+            >
+                ↪ Logout
+            </a>
+
+        </nav>
+
+    </aside>
+
+
+    <!-- Main -->
+
+    <main class="main">
+
+        <div class="header">
+
+            <div>
+
+                <h1>Inventory</h1>
+
+                <p class="employee">
+                    Inventory Staff:
+                    {{ employee.first_name }}
+                    {{ employee.last_name }}
+                </p>
+
+            </div>
+
+            <div class="employee">
+
+                ID: {{ employee.employee_id }}
+
+            </div>
+
+        </div>
+
+
+        <!-- Summary Cards -->
+
+        <div class="cards">
+
+            <div class="card">
+
+                <div class="card-title">
+                    Total Products
+                </div>
+
+                <div class="card-value">
+                    250
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-title">
+                    Low Stock
+                </div>
+
+                <div class="card-value">
+                    12
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-title">
+                    Stock In Today
+                </div>
+
+                <div class="card-value">
+                    45
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-title">
+                    Damaged Items
+                </div>
+
+                <div class="card-value">
+                    3
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Inventory Table -->
+
+        <section class="inventory-section">
+
+            <h2>Current Stock</h2>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Product</th>
+
+                        <th>SKU</th>
+
+                        <th>Quantity</th>
+
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <td>Product 1</td>
+
+                        <td>SKU001</td>
+
+                        <td>120</td>
+
+                        <td>
+                            <span class="status normal">
+                                Normal
+                            </span>
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>Product 2</td>
+
+                        <td>SKU002</td>
+
+                        <td>8</td>
+
+                        <td>
+                            <span class="status low">
+                                Low Stock
+                            </span>
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td>Product 3</td>
+
+                        <td>SKU003</td>
+
+                        <td>0</td>
+
+                        <td>
+                            <span class="status out">
+                                Out of Stock
+                            </span>
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+    </main>
+
+</div>
+
+</body>
+
+</html>

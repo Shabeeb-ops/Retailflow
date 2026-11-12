@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Manager Dashboard | RetailFlow</title>
+{% include "shared/dashboard_theme.html" %}
+</head><body class="theme-manager-dashboard"><main><h1>Manager dashboard</h1><p class="muted">Access your store operations and team tools.</p>
+<nav class="sidebar-menu">
+
+    <!-- Dashboard -->
+    <a href="{% url 'manager_dashboard' %}" class="menu-item">
+        <span class="icon">▦</span>
+        <span>Dashboard</span>
+    </a>
+
+    <!-- POS -->
+    <a href="#" class="menu-item">
+        <span class="icon">🛒</span>
+        <span>POS</span>
+    </a>
+
+    <!-- Products -->
+    <a href="#" class="menu-item">
+        <span class="icon">📦</span>
+        <span>Products</span>
+    </a>
+
+    <!-- Inventory -->
+    <a href="#" class="menu-item">
+        <span class="icon">📊</span>
+        <span>Inventory</span>
+    </a>
+
+    <!-- Purchases -->
+    <a href="#" class="menu-item">
+        <span class="icon">🛍️</span>
+        <span>Purchases</span>
+    </a>
+
+    <!-- Customers -->
+    <a href="#" class="menu-item">
+        <span class="icon">👥</span>
+        <span>Customers</span>
+    </a>
+
+    <!-- Employees -->
+    <a href="{% url 'employee_list' %}" class="menu-item">
+        <span class="icon">👤</span>
+        <span>Employees</span>
+    </a>
+
+    <!-- Expenses -->
+    <a href="#" class="menu-item">
+        <span class="icon">💰</span>
+        <span>Expenses</span>
+    </a>
+
+    <!-- Reports -->
+    <a href="#" class="menu-item">
+        <span class="icon">📈</span>
+        <span>Reports</span>
+    </a>
+
+    <!-- Logout -->
+    <a href="{% url 'employee_logout' %}" class="menu-item logout-item">
+        <span class="icon">↪</span>
+        <span>Logout</span>
+    </a>
+
+</nav>
+
+
+
+</main></body></html>

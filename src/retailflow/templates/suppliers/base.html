@@ -1,0 +1,32 @@
+{% extends base_template|default:"layouts/admin_base.html" %}
+{% block title %}Suppliers | RetailFlow{% endblock %}
+{% block extra_head %}
+<style>
+    .supplier-header, .supplier-actions, .supplier-filters { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .supplier-header { justify-content:space-between; margin-bottom:22px; }
+    .supplier-header h1 { font-size:24px; letter-spacing:-.02em; margin:0 0 6px; }
+    .supplier-muted { color:var(--muted); font-size:13px; }
+    .supplier-header p { margin:0; }
+    .supplier-filters { margin-bottom:20px; }
+    .supplier-filters input, .supplier-filters select { padding:10px; }
+    .supplier-table { overflow-x:auto!important; overflow-y:visible!important; min-height:min-content!important; height:auto!important; max-height:none!important; flex-shrink:0!important; width:100%!important; }
+    .supplier-table table { width:100%!important; min-width:600px; border-collapse:collapse; height:auto!important; }
+    .supplier-table th, .supplier-table td { padding:13px 12px; text-align:left; height:auto!important; }
+    .supplier-table a, .supplier-back { color:var(--ink); }
+    .supplier-back { display:inline-block; margin-bottom:18px; font-size:13px; }
+    .supplier-form { max-width:850px; margin:auto; }
+    .supplier-form fieldset { border:0; padding:0; margin:0 0 25px; }
+    .supplier-form legend { font-weight:600; font-size:16px; margin-bottom:16px; }
+    .supplier-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+    .supplier-field label { display:block; font-weight:600; font-size:13px; margin-bottom:7px; }
+    .supplier-field input:not([type=checkbox]), .supplier-field select, .supplier-field textarea { width:100%; padding:11px 13px; box-sizing:border-box; }
+    .supplier-field textarea { resize:vertical; }
+    .supplier-field .helptext { display:block; margin-top:6px; font-size:12px; color:var(--muted); }
+    .supplier-form .errorlist { font-size:13px; border-left:3px solid var(--ink); padding:8px 8px 8px 24px; }
+    .supplier-details { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; margin-bottom:24px; }
+    .supplier-details dt { color:var(--muted); font-size:12px; margin-bottom:6px; }
+    .supplier-details dd { margin:0; font-size:14px; white-space:pre-wrap; overflow-wrap:anywhere; }
+    .supplier-pagination { display:flex; gap:15px; align-items:center; margin-top:20px; font-size:13px; }
+    @media(max-width:700px) { .supplier-grid, .supplier-details { grid-template-columns:1fr; } }
+</style>
+{% endblock %}

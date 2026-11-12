@@ -1,0 +1,27 @@
+{% extends "purchases/base.html" %}
+{% block purchase_content %}
+<div class="purchase-heading"><h1>{{ order.number }}</h1><span class="status">{{ order.get_status_display }}</span></div>
+<div class="purchase-info"><strong>{{ order.supplier.name }}</strong> · {{ order.supplier.supplier_code }}
+{{ order.supplier.address }} {{ order.supplier.city }}
+{{ order.supplier.phone }} · {{ order.supplier.email }}
+Order date: {{ order.order_date }} · Expected delivery: {{ order.expected_delivery_date|default:'Not specified' }}
+{{ order.notes }}</div>
+<div class="purchase-actions">
+{% if order.status == 'ORDERED' or order.status == 'PARTIALLY_RECEIVED' %}
+<a class="button" href="{% url 'add_goods_receipt' order.pk %}" data-rf-popup="{% url 'add_goods_receipt' order.pk %}" data-rf-title="Receive Goods — {{ order.number }}" data-rf-width="900" data-rf-height="440">Receive goods</a>
+{% endif %}
+{% if order.status == 'DRAFT' %}
+<a class="button" href="{% url 'edit_purchase_order' order.pk %}" data-rf-popup="{% url 'edit_purchase_order' order.pk %}" data-rf-title="Edit Purchase Order {{ order.number }}" data-rf-width="940" data-rf-height="460">Edit draft</a>
+<form method="post" action="{% url 'place_purchase_order' order.pk %}">{% csrf_token %}<button class="button" type="submit" data-confirm="Are you sure you want to place this order? Placed orders cannot be edited.">Place order</button></form>
+{% endif %}
+{% if order.status == 'DRAFT' or order.status == 'ORDERED' %}
+<form method="post" action="{% url 'cancel_purchase_order' order.pk %}">{% csrf_token %}<button class="button secondary" type="submit" data-confirm="Are you sure you want to cancel this purchase order?">Cancel order</button></form>
+{% endif %}
+</div>
+<div class="card purchase-table"><table><thead><tr><th>Product</th><th>SKU</th><th>Ordered</th><th>Accepted</th><th>Remaining</th><th>Unit cost</th><th>Discount</th><th>Tax</th><th>Total</th></tr></thead><tbody>
+{% for line in order.items.all %}<tr><td>{{ line.product_name }}</td><td>{{ line.product_sku }}</td><td>{{ line.quantity }}</td><td>{{ line.received_quantity }}</td><td>{{ line.remaining_quantity }}</td><td>{{ line.unit_cost }}</td><td>{{ line.discount_amount }}</td><td>{{ line.tax_amount }}</td><td>{{ line.line_total }}</td></tr>{% endfor %}
+</tbody></table></div>
+<dl class="purchase-summary"><div><dt>Subtotal</dt><dd>{{ order.totals.subtotal }}</dd></div><div><dt>Discount</dt><dd>{{ order.totals.discount_amount }}</dd></div><div><dt>Tax</dt><dd>{{ order.totals.tax_amount }}</dd></div><div><dt>Total ({{ company.currency }})</dt><dd>{{ order.totals.line_total }}</dd></div></dl>
+<h2>Receiving history</h2><div class="purchase-info">{% for receipt in order.receipts.all %}<a href="{% url 'goods_receipt_detail' receipt.pk %}" data-rf-popup="{% url 'goods_receipt_detail' receipt.pk %}" data-rf-title="Goods Receipt {{ receipt.number }}" data-rf-width="900" data-rf-height="440">{{ receipt.number }}</a> · {{ receipt.get_status_display }} · {{ receipt.receipt_date }}<br>{% empty %}No deliveries recorded.{% endfor %}</div>
+<h2>Internal invoices</h2><div class="purchase-info">{% for invoice in order.invoices.all %}<a href="{% url 'purchase_invoice_detail' invoice.pk %}" data-rf-popup="{% url 'purchase_invoice_detail' invoice.pk %}" data-rf-title="Internal Purchase Invoice {{ invoice.number }}" data-rf-width="900" data-rf-height="480">{{ invoice.number }}</a> · {{ invoice.get_status_display }} · {{ invoice.grand_total }}<br>{% empty %}No invoices yet.{% endfor %}</div>
+{% endblock %}

@@ -1,0 +1,198 @@
+{% extends base_template|default:"layouts/admin_base.html" %}
+
+{% block title %}Add Employee | RetailFlow{% endblock %}
+{% block active_nav %}employees{% endblock %}
+
+{% block extra_head %}
+<style>
+    .employee-form-container {
+        max-width: 800px;
+        margin: 10px auto;
+        width: 100%;
+    }
+    .back-link {
+        display: inline-block;
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 12px;
+    }
+    .back-link:hover {
+        color: var(--ink);
+    }
+    .form-header {
+        margin-bottom: 10px;
+    }
+    .form-header h1 {
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0 0 2px;
+        letter-spacing: -0.01em;
+    }
+    .form-header p {
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.3;
+        margin: 0;
+    }
+    .form-card {
+        background: #fff;
+        padding: 12px 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+    }
+    .rf-compact-form {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+    .rf-grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px 12px;
+    }
+    .rf-field {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+    .rf-field label {
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 3px;
+        color: var(--ink);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .rf-field input,
+    .rf-field select {
+        width: 100%;
+        height: 32px;
+        padding: 4px 10px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font-size: 13px;
+        background: #fff;
+        color: var(--ink);
+        box-sizing: border-box;
+    }
+    .rf-field input:focus, .rf-field select:focus {
+        border-color: var(--ink);
+        outline: none;
+    }
+    .rf-error-text {
+        font-size: 11px;
+        color: #b91c1c;
+        font-weight: 600;
+        margin-top: 2px;
+        line-height: 1.2;
+    }
+    .rf-form-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px solid var(--line);
+    }
+    @media (max-width: 650px) {
+        .rf-grid-3 { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="employee-form-container">
+    {% if not is_popup %}
+    <a href="{% url 'employee_list' %}" class="back-link">
+        &larr; Back to Employees
+    </a>
+    {% endif %}
+
+    <div class="form-header">
+        <h1>Add Employee</h1>
+        <p>Create a user account and assign a role to a new team member.</p>
+    </div>
+
+    <div class="form-card">
+        {% if form.non_field_errors %}
+            <div class="card" style="border-left: 3px solid #b91c1c; padding: 6px 12px; margin-bottom: 8px; font-size: 11px; background: #fff5f5;">
+                {% for error in form.non_field_errors %}
+                    <span class="rf-error-text">{{ error }}</span>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="POST" class="rf-compact-form">
+            {% csrf_token %}
+
+            <!-- Row 1: First Name, Last Name, Role -->
+            <div class="rf-grid-3">
+                <div class="rf-field">
+                    <label for="{{ form.first_name.id_for_label }}">First Name *</label>
+                    {{ form.first_name }}
+                    {% for error in form.first_name.errors %}
+                        <span class="rf-error-text">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="rf-field">
+                    <label for="{{ form.last_name.id_for_label }}">Last Name *</label>
+                    {{ form.last_name }}
+                    {% for error in form.last_name.errors %}
+                        <span class="rf-error-text">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="rf-field">
+                    <label for="{{ form.role.id_for_label }}">Role *</label>
+                    {{ form.role }}
+                    {% for error in form.role.errors %}
+                        <span class="rf-error-text">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Row 2: Email, Password, Confirm Password -->
+            <div class="rf-grid-3">
+                <div class="rf-field">
+                    <label for="{{ form.email.id_for_label }}">Email Address *</label>
+                    {{ form.email }}
+                    {% for error in form.email.errors %}
+                        <span class="rf-error-text">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="rf-field">
+                    <label for="{{ form.password.id_for_label }}">Password *</label>
+                    {{ form.password }}
+                    {% for error in form.password.errors %}
+                        <span class="rf-error-text">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="rf-field">
+                    <label for="{{ form.confirm_password.id_for_label }}">Confirm Password *</label>
+                    {{ form.confirm_password }}
+                    {% for error in form.confirm_password.errors %}
+                        <span class="rf-error-text">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="rf-form-actions">
+                <a href="{% url 'employee_list' %}" class="button secondary" onclick="if(window.RetailFlowWindow){const win=this.closest('.rf-window');if(win){RetailFlowWindow.close(win.id);return false;}}">
+                    Cancel
+                </a>
+                <button type="submit" class="button">
+                    Create Employee
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

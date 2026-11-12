@@ -1,0 +1,198 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Sale {{ sale.sale_number }} | RetailFlow{% endblock %}
+{% block active_nav %}pos_history{% endblock %}
+
+{% block extra_head %}
+<style>
+    .sale-detail-page {
+        width: 100%;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    .back-link {
+        display: inline-block;
+        margin-bottom: 14px;
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 13px;
+    }
+    .back-link:hover { color: var(--ink); }
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+    .page-header h1 {
+        margin: 0 0 4px;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+    .info-card {
+        background: #fff;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+    }
+    .info-card dt {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-bottom: 4px;
+    }
+    .info-card dd {
+        font-size: 15px;
+        font-weight: 600;
+        margin: 0;
+    }
+    .table-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        margin-bottom: 20px;
+        overflow-x: auto;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+    th, td {
+        padding: 12px 14px;
+        text-align: left;
+        border-bottom: 1px solid var(--line);
+    }
+    th {
+        background: var(--cream);
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .num { text-align: right; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sale-detail-page">
+    <a href="{% url 'pos_sales_history' %}" class="back-link">&larr; Back to Sales History</a>
+
+    <div class="page-header">
+        <div>
+            <h1>Sale {{ sale.sale_number }}</h1>
+            <p style="margin:0;color:var(--muted);font-size:13px;">Recorded on {{ sale.created_at|date:"d M Y, h:i A" }}</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+            <a href="{% url 'pos_sales_history' %}" class="button secondary">← Back to Sales History</a>
+            <a href="{% url 'pos' %}" class="button">POS Terminal</a>
+            <a href="{% url 'pos_receipt_print' sale.pk %}" target="_blank" class="button secondary">🖨️ Print Receipt</a>
+        </div>
+    </div>
+
+    <div class="summary-grid">
+        <div class="info-card">
+            <dt>Status</dt>
+            <dd>{{ sale.get_status_display }}</dd>
+        </div>
+        <div class="info-card">
+            <dt>Cashier</dt>
+            <dd>{% if sale.cashier %}{% if sale.cashier.first_name %}{{ sale.cashier.first_name }}{% if sale.cashier.last_name %} {{ sale.cashier.last_name }}{% endif %}{% elif sale.cashier.user.email %}{{ sale.cashier.user.email }}{% else %}Staff{% endif %}{% else %}Staff{% endif %}</dd>
+        </div>
+        <div class="info-card">
+            <dt>Customer</dt>
+            <dd>{{ sale.customer_name|default:"Walk-in Customer" }}</dd>
+        </div>
+        <div class="info-card">
+            <dt>Grand Total</dt>
+            <dd>₹{{ sale.grand_total }}</dd>
+        </div>
+    </div>
+
+    <div class="table-card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Item Description</th>
+                    <th>SKU</th>
+                    <th class="num">Unit Price</th>
+                    <th class="num">Quantity</th>
+                    <th class="num">Discount</th>
+                    <th class="num">Line Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td><strong>{{ item.product_name }}</strong></td>
+                    <td>{{ item.product_sku }}</td>
+                    <td class="num">₹{{ item.unit_price }}</td>
+                    <td class="num">{{ item.quantity }}</td>
+                    <td class="num">₹{{ item.discount_amount }}</td>
+                    <td class="num"><strong>₹{{ item.line_total }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5" class="num" style="font-weight:600;">Subtotal:</td>
+                    <td class="num">₹{{ sale.subtotal }}</td>
+                </tr>
+                {% if sale.discount_amount > 0 %}
+                <tr>
+                    <td colspan="5" class="num" style="font-weight:600;color:#c5221f;">Discount:</td>
+                    <td class="num" style="color:#c5221f;">-₹{{ sale.discount_amount }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td colspan="5" class="num" style="font-size:15px;font-weight:700;">Grand Total:</td>
+                    <td class="num" style="font-size:15px;font-weight:700;">₹{{ sale.grand_total }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <h3 style="margin: 0 0 12px; font-size:16px;">Payment Records</h3>
+    <div class="table-card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th>Amount Paid</th>
+                    <th>Tendered</th>
+                    <th>Change Due</th>
+                    <th>Reference</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in payments %}
+                <tr>
+                    <td><strong>{{ p.get_payment_method_display }}</strong></td>
+                    <td><span class="status-badge completed">{{ p.get_status_display }}</span></td>
+                    <td>₹{{ p.amount }}</td>
+                    <td>{% if p.amount_tendered %}₹{{ p.amount_tendered }}{% else %}—{% endif %}</td>
+                    <td>₹{{ p.change_due }}</td>
+                    <td>{{ p.reference|default:"—" }}</td>
+                    <td>{{ p.created_at|date:"h:i A" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7">No payment entries found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+

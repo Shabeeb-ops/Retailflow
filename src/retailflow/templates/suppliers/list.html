@@ -1,0 +1,34 @@
+{% extends "suppliers/base.html" %}
+{% block content %}
+<div class="supplier-header">
+    <div><h1>Suppliers</h1><p class="supplier-muted">Manage your company's suppliers and product assignments.</p></div>
+    <div class="supplier-actions">
+        <a class="button secondary" href="{% url 'supplier_product_list' %}">Supplier products</a>
+        <a class="button" href="{% url 'add_supplier' %}" data-rf-popup="{% url 'add_supplier' %}" data-rf-title="Add Supplier" data-rf-width="960" data-rf-height="520">Add supplier</a>
+    </div>
+</div>
+<form method="get" class="supplier-filters">
+    <label for="supplier-search">Search suppliers</label><input id="supplier-search" type="search" name="q" value="{{ search }}">
+    <label for="supplier-status">Status</label><select name="status" id="supplier-status">
+        <option value="">All statuses</option><option value="active" {% if selected_status == 'active' %}selected{% endif %}>Active</option><option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>Inactive</option>
+    </select><button class="button" type="submit">Filter</button><a class="button secondary" href="{% url 'supplier_list' %}">Reset</a>
+</form>
+<div class="card supplier-table"><table>
+    <thead><tr><th>Code</th><th>Name</th><th>Contact person</th><th>Phone</th><th>City</th><th>GSTIN</th><th>WhatsApp alerts</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>{% for supplier in page_obj %}<tr>
+        <td>{{ supplier.supplier_code }}</td>
+        <td><a href="{% url 'supplier_detail' supplier.pk %}" data-rf-popup="{% url 'supplier_detail' supplier.pk %}" data-rf-title="{{ supplier.name }}" data-rf-width="840" data-rf-height="540"><strong>{{ supplier.name }}</strong></a></td>
+        <td>{{ supplier.contact_person|default:"—" }}</td>
+        <td>{{ supplier.phone|default:"—" }}</td>
+        <td>{{ supplier.city|default:"—" }}</td>
+        <td>{{ supplier.gstin|default:"—" }}</td>
+        <td>{% if supplier.auto_stock_alerts_enabled and supplier.whatsapp_opt_in %}Configured{% else %}Off{% endif %}</td>
+        <td><span class="status {{ supplier.is_active|yesno:'active,inactive' }}">{{ supplier.is_active|yesno:'Active,Inactive' }}</span></td>
+        <td>
+            <a href="{% url 'supplier_detail' supplier.pk %}" data-rf-popup="{% url 'supplier_detail' supplier.pk %}" data-rf-title="{{ supplier.name }}" data-rf-width="840" data-rf-height="540">View</a> · 
+            <a href="{% url 'edit_supplier' supplier.pk %}" data-rf-popup="{% url 'edit_supplier' supplier.pk %}" data-rf-title="Edit Supplier — {{ supplier.name }}" data-rf-width="960" data-rf-height="520">Edit</a>
+        </td>
+    </tr>{% empty %}<tr><td colspan="9">No suppliers found.</td></tr>{% endfor %}</tbody>
+</table></div>
+{% include "suppliers/pagination.html" %}
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "suppliers/base.html" %}
+{% block content %}
+<a class="supplier-back" href="{% url 'supplier_list' %}">&larr; Back to suppliers</a>
+<div class="supplier-header">
+    <div><h1>Supplier products</h1><p class="supplier-muted">Link company products and select one preferred supplier per product.</p></div>
+    <a class="button" href="{% url 'add_supplier_product' %}" data-rf-popup="{% url 'add_supplier_product' %}" data-rf-title="Assign Product" data-rf-width="640" data-rf-height="480">Assign product</a>
+</div>
+{% include "suppliers/links.html" with links=page_obj %}
+{% include "suppliers/pagination.html" %}
+{% endblock %}

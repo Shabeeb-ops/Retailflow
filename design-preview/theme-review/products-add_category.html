@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Add Category | RetailFlow</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background: var(--cream);
+            color: var(--ink);
+        }
+
+        .page {
+            max-width: 700px;
+            margin: 60px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--ink);
+        }
+
+        textarea {
+            min-height: 110px;
+            resize: vertical;
+        }
+
+        .checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox input {
+            width: auto;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 11px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn-cancel {
+            background: var(--cream);
+            color: var(--ink);
+        }
+
+        .btn-save {
+            background: var(--ink);
+            color: white;
+        }
+
+        .error {
+            color: var(--ink);
+            font-size: 13px;
+            margin-top: 5px;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --ink: #0d0d0d;
+        --ink-2: #1c1c1c;
+        --bg: #ffffff;
+        --cream: #f4f3ee;
+        --card: #ffffff;
+        --line: #dedbd0;
+        --muted: #6d6b63;
+        --muted-dark: #8a8a85;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body, input, select, textarea, button {
+        font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    }
+    body { background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; }
+    h1, h2, h3 { color: var(--ink); font-weight: 700; }
+    h1, .header h1, .page-header h1 { font-size: clamp(24px, 3vw, 30px); letter-spacing: -.02em; line-height: 1.2; }
+    h2 { font-size: 20px; letter-spacing: -.02em; }
+    h3 { font-size: 15px; }
+    p { line-height: 1.6; }
+    a { color: var(--ink); }
+    .muted, .subtitle, .employee, .employee-info, .header p, .empty, .back-link { color: var(--muted); }
+    .logo { font-size: 15px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .card, .stat-card, .panel, .table-container, .inventory-section, .products, .cart,
+    .welcome, .login-container, .theme-create-employee .container, .theme-import-preview .container {
+        background: var(--card); border: 1px solid var(--line); border-radius: 12px; box-shadow: none;
+    }
+    .stat-label, .card-title {
+        color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    }
+    .stat-value, .card-value { color: var(--ink); font-size: 28px; font-weight: 700; letter-spacing: -.02em; }
+    label { color: var(--ink); font-size: 12px; font-weight: 600; }
+    input, select, textarea, .field input, .field select {
+        background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 8px;
+        font-size: 13px; accent-color: var(--ink);
+    }
+    input::placeholder, textarea::placeholder { color: var(--muted); }
+    input:focus, select:focus, textarea:focus, .field input:focus, .field select:focus {
+        border-color: var(--ink); outline: 2px solid var(--line); outline-offset: 2px; box-shadow: none;
+    }
+    button, .button, .btn, .btn.green, .btn-save, .btn-primary, .payment-btn, .add-button,
+    .navbar .logout {
+        background: var(--ink); color: var(--bg); border: 1px solid var(--ink); border-radius: 8px;
+        font-size: 12px; font-weight: 600; text-decoration: none; cursor: pointer;
+    }
+    button:hover, .button:hover, .btn:hover, .btn-save:hover, .btn-primary:hover,
+    .payment-btn:hover, .add-button:hover, .navbar .logout:hover { background: var(--ink-2); color: var(--bg); }
+    .btn.secondary, .btn-cancel { background: var(--bg); color: var(--ink); border: 1px solid var(--line); }
+    .btn.secondary:hover, .btn-cancel:hover { background: var(--cream); color: var(--ink); }
+    button:disabled, .btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+    input[type="file"]::file-selector-button {
+        font: inherit; background: var(--cream); color: var(--ink); border: 1px solid var(--line);
+        border-radius: 6px; padding: 6px 10px; margin-right: 8px; cursor: pointer;
+    }
+    table { border-collapse: collapse; }
+    thead, th { background: var(--cream); }
+    th { color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+    td { color: var(--ink); font-size: 13px; }
+    th, td, .panel-header, .cart-item, .navbar { border-color: var(--line); }
+    tbody tr:hover, tbody tr:hover td, .product:hover { background: var(--cream); }
+    .table-container, .table-wrap, .table-wrapper { overflow-x: auto; }
+    .role, .status, .badge, .stock-badge {
+        display: inline-block; border: 1px solid var(--line); border-radius: 999px;
+        font-size: 10px; font-weight: 600; letter-spacing: .04em;
+        background: var(--cream); color: var(--ink);
+    }
+    .status.online, .status.active, .status.normal, .badge.in-stock, .stock-badge.in-stock {
+        background: var(--cream); color: var(--ink);
+    }
+    .status.offline, .status.inactive { background: var(--bg); color: var(--muted); }
+    .status.low, .badge.low-stock, .stock-badge.low-stock { background: var(--bg); color: var(--ink); border-color: var(--ink); }
+    .status.out, .badge.out-of-stock, .stock-badge.out-of-stock { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    .message, .alert.success { background: var(--cream); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; }
+    .error, .error-text, .row-error, .errorlist { color: var(--ink); font-weight: 600; }
+    .alert.error { background: var(--cream); color: var(--ink); border: 1px solid var(--ink); border-left-width: 4px; }
+    .errorlist { padding-left: 20px; font-size: 12px; }
+    .price, .employee-id, .product-name { color: var(--ink); }
+    .sidebar { background: var(--bg); color: var(--ink); border-right: 1px solid var(--line); flex-shrink: 0; }
+    .menu a { color: var(--muted); font-size: 13px; font-weight: 500; }
+    .menu a:hover { background: var(--cream); color: var(--ink); }
+    .menu a.active { background: var(--ink); color: var(--bg); font-weight: 600; }
+    .theme-manager-dashboard { margin: 0; padding: 32px; }
+    .theme-manager-dashboard main { max-width: 1100px; margin: auto; }
+    .theme-manager-dashboard .sidebar-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 24px; }
+    .theme-manager-dashboard .menu-item { display: flex; gap: 12px; align-items: center; padding: 20px; border: 1px solid var(--line); border-radius: 12px; text-decoration: none; font-size: 13px; font-weight: 500; }
+    .theme-manager-dashboard .menu-item:hover { background: var(--cream); }
+    .theme-manager-dashboard .icon { filter: grayscale(1); }
+    .theme-create-employee, .theme-login { padding: 24px; }
+    .theme-create-employee .container, .login-container { max-width: 100%; }
+    .main { min-width: 0; }
+    @media (max-width: 700px) {
+        .theme-employee-list, .theme-import-preview { padding: 18px 12px; }
+        .theme-create-employee, .theme-login { padding: 18px 12px; }
+        .theme-create-employee .container, .login-container { padding: 24px; }
+        .header, .page-header { flex-wrap: wrap; gap: 16px; }
+        .theme-manager-dashboard { padding: 20px 16px; }
+        .theme-manager-dashboard .sidebar-menu { grid-template-columns: 1fr; }
+        .theme-pos .layout, .theme-inventory .layout { flex-direction: column; }
+        .theme-pos .sidebar, .theme-inventory .sidebar { width: 100%; border-right: 0; border-bottom: 1px solid var(--line); }
+        .theme-pos .menu, .theme-inventory .menu { flex-direction: row; flex-wrap: wrap; }
+        .theme-pos .sidebar .logo, .theme-inventory .sidebar .logo { margin-bottom: 14px; }
+        .theme-pos .main, .theme-inventory .main { padding: 18px 12px; }
+        .theme-pos .pos-layout { grid-template-columns: 1fr; }
+        .theme-inventory .inventory-section { overflow-x: auto; }
+        .theme-dashboard .navbar { padding: 18px 16px; }
+        .theme-dashboard .container { padding: 20px 16px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+</style>
+
+</head>
+
+<body class="theme-add-category">
+
+<div class="page">
+
+    <div class="card">
+
+        <div class="header">
+            <h1>Add Category</h1>
+            <p>Create a product category for your company.</p>
+        </div>
+
+        <form method="POST">
+
+            
+
+            <div class="form-group">
+                <label for="id_name">
+                    Category Name
+                </label>
+
+                <input type="text" name="name" maxlength="100" required id="id_name">
+
+                
+            </div>
+
+
+            <div class="form-group">
+                <label for="id_description">
+                    Description
+                </label>
+
+                <input type="text" name="description" maxlength="100" id="id_description">
+
+                
+            </div>
+
+
+            <div class="form-group">
+
+                <div class="checkbox">
+                    <input type="checkbox" name="is_active" id="id_is_active" checked>
+
+                    <label for="id_is_active">
+                        Active Category
+                    </label>
+                </div>
+
+            </div>
+
+
+            <div class="actions">
+
+                <a href="#" class="btn btn-cancel">
+                    Cancel
+                </a>
+
+                <button type="submit" class="btn btn-save">
+                    Save Category
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,243 @@
+{% extends base_template|default:"layouts/admin_base.html" %}
+
+{% block title %}{% if editing %}Edit Branch{% else %}Add Branch{% endif %} | RetailFlow{% endblock %}
+{% block active_nav %}branches{% endblock %}
+
+{% block extra_head %}
+<style>
+    .branch-form-container {
+        max-width: 900px;
+        margin: 10px auto;
+        width: 100%;
+    }
+    .back-link {
+        display: inline-block;
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        margin-bottom: 12px;
+    }
+    .back-link:hover {
+        color: var(--ink);
+    }
+    .form-header {
+        margin-bottom: 10px;
+    }
+    .form-header h1 {
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0 0 2px;
+        letter-spacing: -0.01em;
+    }
+    .subtitle {
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.3;
+        margin: 0;
+    }
+    .form-card {
+        background: #fff;
+        padding: 12px 16px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+    }
+    .rf-compact-form {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+    .rf-grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px 12px;
+    }
+    .rf-field {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+    .rf-field label {
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 3px;
+        color: var(--ink);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .rf-field input:not([type="checkbox"]),
+    .rf-field select,
+    .rf-field textarea {
+        width: 100%;
+        height: 32px;
+        padding: 4px 10px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        font-size: 13px;
+        background: #fff;
+        color: var(--ink);
+        box-sizing: border-box;
+    }
+    .rf-field textarea {
+        height: 38px !important;
+        min-height: 34px !important;
+        max-height: 52px !important;
+        resize: none !important;
+        line-height: 1.3 !important;
+    }
+    .rf-checkbox-field {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 32px;
+        margin-top: auto;
+    }
+    .rf-checkbox-field input[type="checkbox"] {
+        width: 15px;
+        height: 15px;
+        margin: 0;
+        cursor: pointer;
+        accent-color: var(--ink);
+    }
+    .rf-checkbox-field label {
+        font-size: 12px;
+        font-weight: 500;
+        margin: 0;
+        cursor: pointer;
+        user-select: none;
+    }
+    .rf-form-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px solid var(--line);
+    }
+    .rf-error-text {
+        font-size: 11px;
+        color: #b91c1c;
+        font-weight: 600;
+        margin-top: 2px;
+        line-height: 1.2;
+    }
+    .rf-help-text {
+        font-size: 10px;
+        color: var(--muted);
+        margin-top: 1px;
+    }
+    @media (max-width: 680px) {
+        .rf-grid-3 { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="branch-form-container">
+    {% if not is_popup %}
+    <a href="{% url 'branch_list' %}" class="back-link">
+        &larr; Back to Branch Management
+    </a>
+    {% endif %}
+
+    <div class="form-header">
+        <h1>
+            {% if editing %}
+                Edit Branch — {{ branch.name }}
+            {% else %}
+                Add New Branch
+            {% endif %}
+        </h1>
+        <p class="subtitle">
+            Create or update a retail store, outlet, or warehouse for <strong>{{ company.company_name|default:"your company" }}</strong>.
+        </p>
+    </div>
+
+    <div class="form-card">
+        {% if form.non_field_errors %}
+            <div class="card" style="border-left: 3px solid #b91c1c; padding: 6px 12px; margin-bottom: 8px; font-size: 11px; background: #fff5f5;">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <form method="post" action="{% if editing %}{% url 'edit_branch' branch.pk %}{% else %}{% url 'add_branch' %}{% endif %}" class="rf-compact-form">
+            {% csrf_token %}
+
+            <!-- Row 1: Name, Code, Branch Type -->
+            <div class="rf-grid-3">
+                <div class="rf-field">
+                    <label for="{{ form.name.id_for_label }}">Branch Name *</label>
+                    {{ form.name }}
+                    {% for error in form.name.errors %}
+                        <span class="rf-error-text">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="rf-field">
+                    <label for="{{ form.code.id_for_label }}">Branch Code *</label>
+                    {{ form.code }}
+                    {% for error in form.code.errors %}
+                        <span class="rf-error-text">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="rf-field">
+                    <label for="{{ form.branch_type.id_for_label }}">Branch Type *</label>
+                    {{ form.branch_type }}
+                    {% for error in form.branch_type.errors %}
+                        <span class="rf-error-text">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Row 2: Phone, Email, Active Status -->
+            <div class="rf-grid-3">
+                <div class="rf-field">
+                    <label for="{{ form.phone.id_for_label }}">Phone Number</label>
+                    {{ form.phone }}
+                    {% for error in form.phone.errors %}
+                        <span class="rf-error-text">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="rf-field">
+                    <label for="{{ form.email.id_for_label }}">Email Address</label>
+                    {{ form.email }}
+                    {% for error in form.email.errors %}
+                        <span class="rf-error-text">{{ error }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="rf-checkbox-field">
+                    {{ form.is_active }}
+                    <label for="{{ form.is_active.id_for_label }}">Branch is Active</label>
+                    {% for error in form.is_active.errors %}
+                        <span class="rf-error-text">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Row 3: Address (Full Width) -->
+            <div class="rf-field">
+                <label for="{{ form.address.id_for_label }}">Branch Address</label>
+                {{ form.address }}
+                {% for error in form.address.errors %}
+                    <span class="rf-error-text">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div class="rf-form-actions">
+                <a href="{% url 'branch_list' %}" class="button secondary" onclick="if(window.RetailFlowWindow){const win=this.closest('.rf-window');if(win){RetailFlowWindow.close(win.id);return false;}}">
+                    Cancel
+                </a>
+                <button type="submit" class="button">
+                    Save Branch
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

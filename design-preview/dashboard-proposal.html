@@ -1,0 +1,1182 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | RetailFlow</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --ink: #0d0d0d;
+            --ink-2: #1c1c1c;
+            --bg: #ffffff;
+            --cream: #f4f3ee;
+            --card: #ffffff;
+            --line: #dedbd0;
+            --muted: #6d6b63;
+            --muted-dark: #8a8a85;
+            --blue: #0d0d0d;
+            --blue-dark: #0d0d0d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system,
+                         'Segoe UI', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--ink);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .icon {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            flex-shrink: 0;
+        }
+
+        /* ===== LAYOUT ===== */
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ===== SIDEBAR ===== */
+
+        .sidebar {
+            width: 250px;
+            background: #fff;
+            color: var(--ink);
+            border-right: 1px solid var(--line);
+            min-height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-x: hidden;
+            overflow-y: auto;
+            transition: width 0.3s;
+            z-index: 10;
+        }
+
+        .sidebar.collapsed {
+            width: 70px;
+        }
+
+        .logo {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 20px;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--line);
+            white-space: nowrap;
+        }
+
+        .logo-mark {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            background: var(--ink);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            animation: drop-in 0.9s
+                       cubic-bezier(0.33, 0, 0.67, 1) both;
+        }
+
+        @keyframes drop-in {
+            0% {
+                transform: translateY(-70px);
+                opacity: 0;
+            }
+
+            15% {
+                opacity: 1;
+            }
+
+            60% {
+                transform: translateY(0);
+                animation-timing-function: ease-out;
+            }
+
+            80% {
+                transform: translateY(-8px);
+                animation-timing-function: ease-in;
+            }
+
+            100% {
+                transform: translateY(0);
+            }
+        }
+
+        .logo-mark .icon {
+            width: 17px;
+            height: 17px;
+            stroke-width: 2;
+        }
+
+        .company-box {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .company-name {
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .company-role {
+            margin-top: 4px;
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .menu {
+            padding: 14px 12px 24px;
+        }
+
+        .menu-title {
+            padding: 14px 12px 8px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #9a978b;
+            white-space: nowrap;
+        }
+
+        .menu-item {
+            height: 42px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 12px;
+            margin-bottom: 2px;
+            border-radius: 8px;
+            color: #55534b;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .menu-item:hover {
+            background: var(--cream);
+            color: var(--ink);
+        }
+
+        .menu-item.active {
+            background: var(--ink);
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .sidebar.collapsed .logo-text,
+        .sidebar.collapsed .company-box,
+        .sidebar.collapsed .menu-item span {
+            display: none;
+        }
+
+        .sidebar.collapsed .logo,
+        .sidebar.collapsed .menu-item {
+            justify-content: center;
+            padding: 0;
+        }
+
+        .sidebar.collapsed .menu-title {
+            font-size: 0;
+            padding: 10px 0;
+        }
+
+        /* ===== MAIN ===== */
+
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            transition: margin-left 0.3s, width 0.3s;
+        }
+
+        .sidebar.collapsed ~ .main {
+            margin-left: 70px;
+            width: calc(100% - 70px);
+        }
+
+        /* ===== TOP BAR ===== */
+
+        .topbar {
+            height: 70px;
+            background: var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            border-bottom: 1px solid var(--line);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .left-top {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .toggle-btn {
+            border: none;
+            background: transparent;
+            color: var(--ink);
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            padding: 4px;
+        }
+
+        .toggle-btn .icon {
+            width: 22px;
+            height: 22px;
+        }
+
+        .search-box {
+            width: 340px;
+            height: 40px;
+            background: #fff;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 12px;
+            color: var(--muted);
+            transition: border-color 0.2s,
+                        box-shadow 0.2s;
+        }
+
+        .search-box:focus-within {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px
+                        rgba(13, 13, 13, 0.08);
+        }
+
+        .search-box input {
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 100%;
+            font-size: 13px;
+            color: var(--ink);
+        }
+
+        .search-box input::placeholder {
+            color: #a3a094;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .notification {
+            position: relative;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+        }
+
+        .notification::after {
+            content: '';
+            position: absolute;
+            top: -1px;
+            right: 0;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--blue);
+            border: 1.5px solid var(--bg);
+        }
+
+        .user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--ink);
+            color: var(--cream);
+            display: grid;
+            place-items: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .user-info strong {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .user-info small {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        /* ===== CONTENT ===== */
+
+        .content {
+            padding: 32px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .kicker {
+            margin-bottom: 10px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .page-header h1 {
+            font-size: clamp(28px, 3vw, 40px);
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+        }
+
+        .page-header p {
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .date-box {
+            border: 1px solid var(--ink);
+            padding: 9px 16px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+        }
+
+        /* ===== STAT CARDS ===== */
+
+        .stats,
+        .small-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .small-stats {
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 22px;
+        }
+
+        .stat-title,
+        .small-stat-title {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .stat-value {
+            margin-top: 12px;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .stat-change {
+            margin-top: 10px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--blue);
+        }
+
+        .small-stat {
+            background: var(--cream);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 20px 22px;
+        }
+
+        .small-stat-value {
+            margin-top: 10px;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        /* ===== BRANCH MANAGEMENT ===== */
+
+        .branch-shortcut {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 20px;
+            padding: 20px 22px;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            color: var(--ink);
+            text-decoration: none;
+            transition: background 0.2s,
+                        border-color 0.2s;
+        }
+
+        .branch-shortcut:hover,
+        .branch-shortcut:focus-visible {
+            background: var(--cream);
+            border-color: var(--ink);
+        }
+
+        .branch-shortcut-icon {
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+            background: var(--ink);
+            color: #fff;
+        }
+
+        .branch-shortcut-icon .icon {
+            width: 22px;
+            height: 22px;
+        }
+
+        .branch-shortcut-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .branch-shortcut-title {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .branch-shortcut-description {
+            display: block;
+            margin-top: 7px;
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--muted);
+        }
+
+        .branch-shortcut-action {
+            flex-shrink: 0;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* ===== LOWER SECTION ===== */
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 16px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .card-header h3 {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .card-header a {
+            color: var(--blue);
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .card-header a:hover {
+            text-decoration: underline;
+        }
+
+        /* ===== SALES CHART ===== */
+
+        .chart {
+            position: relative;
+            height: 270px;
+            padding-top: 20px;
+            border-bottom: 1px solid var(--ink);
+        }
+
+        .plot {
+            position: relative;
+            height: 100%;
+            background: repeating-linear-gradient(
+                to top,
+                transparent 0,
+                transparent 49px,
+                var(--line) 49px,
+                var(--line) 50px
+            );
+        }
+
+        .plot svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+            animation: reveal 1.1s ease-out both;
+        }
+
+        .line {
+            fill: none;
+            stroke: var(--ink);
+            stroke-width: 2.5;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+            vector-effect: non-scaling-stroke;
+        }
+
+        .area {
+            fill: url(#areaFill);
+        }
+
+        .dot {
+            position: absolute;
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid var(--ink);
+            transform: translate(-50%, 50%);
+            transition: transform 0.2s;
+            animation: fade 0.4s ease-out 0.9s both;
+        }
+
+        .dot:hover {
+            transform: translate(-50%, 50%) scale(1.4);
+        }
+
+        .dot.last {
+            background: var(--blue);
+            border-color: var(--blue);
+        }
+
+        .chart-empty {
+            position: absolute;
+            inset: 20px 0 0;
+            display: none;
+            place-items: center;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .chart.empty .chart-empty {
+            display: grid;
+        }
+
+        .chart.empty .plot svg,
+        .chart.empty .dot {
+            display: none;
+        }
+
+        .empty-row td {
+            padding: 36px 8px;
+            text-align: center;
+            color: var(--muted);
+            border-bottom: none;
+        }
+
+        .stat-change.down {
+            color: #c2410c;
+        }
+
+        @keyframes reveal {
+            from {
+                clip-path: inset(0 100% 0 0);
+            }
+
+            to {
+                clip-path: inset(0 -10px 0 0);
+            }
+        }
+
+        @keyframes fade {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .chart-labels {
+            display: flex;
+            padding: 10px 0 0;
+            color: var(--muted);
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .chart-labels span {
+            flex: 1;
+            text-align: center;
+        }
+
+        /* ===== TABLE ===== */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th {
+            text-align: left;
+            padding: 10px 8px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+            border-bottom: 1px solid var(--ink);
+        }
+
+        td {
+            padding: 14px 8px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        tbody tr:hover td {
+            background: #f7f7f4;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .paid,
+        .received {
+            background: var(--cream);
+            color: var(--ink);
+        }
+
+        .pending {
+            background: #fff;
+            color: var(--muted);
+            border: 1px solid var(--line);
+        }
+
+        .ordered {
+            background: var(--ink);
+            color: #fff;
+        }
+
+        /* ===== RESPONSIVE ===== */
+
+        @media (max-width: 1100px) {
+            .stats,
+            .small-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-box {
+                width: 240px;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .sidebar .logo-text,
+            .sidebar .company-box,
+            .sidebar .menu-item span {
+                display: none;
+            }
+
+            .sidebar .logo,
+            .sidebar .menu-item {
+                justify-content: center;
+                padding: 0;
+            }
+
+            .sidebar .menu-title {
+                font-size: 0;
+                padding: 10px 0;
+            }
+
+            .main {
+                margin-left: 70px;
+                width: calc(100% - 70px);
+            }
+
+            .stats,
+            .small-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .search-box,
+            .user-info {
+                display: none;
+            }
+
+            .topbar {
+                padding: 0 16px;
+            }
+
+            .content {
+                padding: 18px 16px;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .branch-shortcut {
+                flex-wrap: wrap;
+            }
+
+            .branch-shortcut-action {
+                width: 100%;
+                padding-left: 64px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .plot svg,
+            .dot,
+            .logo-mark {
+                animation: none;
+            }
+
+            * {
+                transition: none !important;
+            }
+        }
+    </style>
+<style>
+.content{max-width:1600px;margin:auto}.preview-note{background:var(--cream);padding:10px 20px;text-align:center;font-size:11px;border-bottom:1px solid var(--line)}
+.page-header{justify-content:space-between;margin-bottom:26px}.page-header h1{font-size:30px;text-transform:none;line-height:1.2}.page-header p{line-height:1.6}.kicker{margin-bottom:8px}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.button{background:var(--ink);color:var(--bg);border:1px solid var(--ink);padding:11px 15px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:600;cursor:pointer}.button.secondary{background:var(--bg);color:var(--ink);border-color:var(--line)}
+.stat-top{display:flex;justify-content:space-between;align-items:center}.stat-top .icon{color:var(--muted)}.stat-value{font-size:30px}.stat-change{color:var(--muted);font-size:11px;line-height:1.5}.stats{margin-bottom:22px}
+.dashboard-grid{grid-template-columns:minmax(0,1.65fr) minmax(270px,1fr);margin-bottom:22px;align-items:stretch}.card-header h3{font-size:11px}.card-header{margin-bottom:18px}.section-subtitle{font-size:12px;color:var(--muted);margin:-7px 0 20px;line-height:1.6}
+.inventory-summary{display:flex;align-items:baseline;gap:10px;margin:22px 0}.inventory-summary strong{font-size:32px;letter-spacing:-1px}.inventory-summary span{font-size:12px;color:var(--muted)}.stock-bar{height:12px;border-radius:6px;overflow:hidden;display:flex;background:var(--cream);border:1px solid var(--line)}.stock-bar span:first-child{width:88%;background:var(--ink)}.stock-bar span:nth-child(2){width:8%;background:var(--muted)}.legend{display:flex;justify-content:space-between;gap:14px;margin:18px 0 26px;font-size:11px;color:var(--muted);line-height:1.8}.legend b{display:block;color:var(--ink);font-size:16px}.mini-heading{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}.metric-row{display:flex;justify-content:space-between;padding:14px 0;border-top:1px solid var(--line);font-size:12px}.metric-row strong{font-weight:600}
+.attention{background:var(--cream)}.alert-row{padding:15px 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;font-size:12px;align-items:center}.alert-row strong{display:block;font-size:12px;margin-bottom:5px}.alert-row small{color:var(--muted);line-height:1.5}.pill{border:1px solid var(--line);background:var(--bg);padding:5px 8px;border-radius:20px;font-size:10px;white-space:nowrap}.wide-button{display:block;text-align:center;margin-top:16px}.shortcut-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.shortcut{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:16px;color:var(--ink);text-decoration:none;font-size:12px;font-weight:600}.shortcut:hover{background:var(--cream)}.shortcut small{display:block;font-weight:400;color:var(--muted);font-size:11px;margin-top:5px}.shortcut .icon{width:20px;height:20px}.card table th{border-bottom-color:var(--line)}.card table td{font-size:12px}.numeric{text-align:right}.subcell{display:block;font-size:10px;color:var(--muted);margin-top:5px}.footer-note{font-size:11px;color:var(--muted);line-height:1.7;margin-top:18px}.notification::after{display:none}.notification{cursor:default}.preview-toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:14px 20px;border-radius:8px;font-size:12px;z-index:30;max-width:90vw}.menu-item[hidden]{display:none}button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+@media(max-width:1100px){.dashboard-grid{grid-template-columns:1fr}.shortcut-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:700px){.page-header h1{font-size:26px}.stats{grid-template-columns:1fr 1fr;gap:10px}.card{padding:18px}.stat-value{font-size:24px}.stat-title{font-size:9px}.shortcut-grid{grid-template-columns:1fr}.preview-note{font-size:10px}.legend{gap:8px}.actions{width:100%}}@media(max-width:380px){.stats{grid-template-columns:1fr}}
+</style><style>
+.content{padding:22px 26px}.preview-note{padding:6px 16px;font-size:10px}.topbar{height:60px}.page-header{margin-bottom:17px}.page-header h1{font-size:25px}.page-header p{font-size:12px;margin-top:6px}.kicker{font-size:9px;margin-bottom:5px}.date-box{font-size:10px}.button{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 13px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:13px}.card{padding:17px;border-radius:10px}.stat-value{font-size:27px;margin-top:9px}.stat-change{margin-top:7px;font-size:10px}.stat-title{font-size:9px}.stat-link{text-decoration:none;color:var(--ink);display:block}.stat-link:hover{border-color:var(--ink)}.erp-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:var(--cream);border:1px solid var(--line);border-radius:10px;margin-bottom:16px}.erp-strip a{display:flex;align-items:center;justify-content:space-between;padding:13px 17px;border-right:1px solid var(--line);text-decoration:none;color:var(--ink);font-size:11px;gap:8px}.erp-strip a:last-child{border:0}.erp-strip strong{font-size:17px}.erp-main{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(260px,1fr);gap:14px;margin-bottom:14px}.erp-bottom{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(260px,1fr);gap:14px}.card-header{margin-bottom:12px}.card-header h3{font-size:10px}.card-header a{font-size:10px}.chart-total{display:flex;align-items:baseline;gap:10px;margin:4px 0 12px}.chart-total strong{font-size:24px}.chart-total span{font-size:10px;color:var(--muted)}.trend{height:116px;display:flex;gap:10px}.axis{display:flex;flex-direction:column;justify-content:space-between;font-size:9px;color:var(--muted);padding-bottom:18px}.bars{display:flex;align-items:flex-end;justify-content:space-around;gap:12px;flex:1;border-bottom:1px solid var(--line);padding:0 10px 18px;background:repeating-linear-gradient(to top,transparent 0,transparent 32px,var(--cream) 32px,var(--cream) 33px)}.bar-item{height:100%;flex:1;display:flex;align-items:center;justify-content:flex-end;flex-direction:column;position:relative}.bar{background:var(--ink);width:65%;max-width:34px;border-radius:3px 3px 0 0;min-height:2px}.bar-item span{position:absolute;bottom:-15px;color:var(--muted);font-size:9px}.alert-row{padding:10px 0;text-decoration:none;color:var(--ink)}.alert-row strong{font-size:11px;margin-bottom:3px}.alert-row small{font-size:10px}.pill{font-size:9px}.card table td{padding:10px 7px;font-size:11px}.card table th{padding:7px;font-size:9px}.metric-row{padding:10px 0;font-size:11px}.footer-note{margin-top:11px;font-size:10px}.quick-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.quick-actions a{font-size:10px;padding:8px 10px}.section-subtitle{font-size:11px}.module-heading{margin-bottom:20px}.module-heading h1{font-size:28px;margin-bottom:8px}.module-heading p{font-size:12px;color:var(--muted)}.module-label{margin-bottom:18px;display:inline-block}.table-wrapper{max-width:100%}.topbar .search-box{width:260px}.balance{font-size:21px;font-weight:700;margin-bottom:12px}.muted{color:var(--muted)}.sidebar{height:100vh;min-height:0}.logo{height:60px}.menu{padding-top:8px}.menu-item{height:36px;font-size:12px}.menu-title{padding-top:11px}.company-box{padding:13px 20px}.topbar .user-info strong{font-size:12px}.notification{display:none}.button.secondary:hover,.erp-strip a:hover{background:var(--cream)}.menu-item[aria-current=page]{background:var(--ink);color:var(--bg)}
+@media(min-width:1200px) and (min-height:850px){.content{padding-top:28px}.card{padding:21px}.trend{height:160px}.alert-row{padding:13px 0}.card table td{padding:14px 7px}}
+@media(max-width:1100px){.erp-main,.erp-bottom{grid-template-columns:minmax(0,1.4fr) minmax(230px,1fr)}.content{padding:18px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.erp-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.erp-strip a:nth-child(2){border-right:0}.topbar .search-box{width:190px}}
+@media(max-width:800px){.erp-main,.erp-bottom{grid-template-columns:1fr}.page-header{align-items:flex-start;flex-direction:column}.actions{width:auto}.erp-strip a{padding:12px}.topbar .search-box{display:none}}@media(max-width:420px){.stats{gap:8px}.card{padding:13px}.stat-value{font-size:23px}.erp-strip{grid-template-columns:1fr}.erp-strip a{border-right:0;border-bottom:1px solid var(--line)}.content{padding:14px 10px}.date-box{padding:8px}.topbar{padding:0 12px}}
+
+.line-plot{flex:1;min-width:0;display:flex;flex-direction:column}.line-plot svg{display:block;width:100%;flex:1;min-height:0;overflow:visible}.sales-line{fill:none;stroke:var(--ink);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}.line-grid{stroke:var(--line);stroke-width:1;vector-effect:non-scaling-stroke}.line-labels{display:flex;justify-content:space-between;padding-top:6px;font-size:9px;color:var(--muted)}.line-labels span{width:28px;text-align:center}.admin-scope{display:inline-flex;align-items:center;gap:6px;font-size:10px;color:var(--muted)}
+</style></head>
+
+<body>
+
+<!-- ===== ICON SPRITE ===== -->
+
+<svg width="0"
+     height="0"
+     style="position:absolute"
+     aria-hidden="true">
+
+    <defs>
+
+        <symbol id="i-cart" viewBox="0 0 24 24">
+            <circle cx="9" cy="20" r="1.5"/>
+            <circle cx="18" cy="20" r="1.5"/>
+            <path d="M2 3h3l2.5 12h11L21 7H6"/>
+        </symbol>
+
+        <symbol id="i-dash" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="7" height="7" rx="1"/>
+            <rect x="14" y="3" width="7" height="7" rx="1"/>
+            <rect x="3" y="14" width="7" height="7" rx="1"/>
+            <rect x="14" y="14" width="7" height="7" rx="1"/>
+        </symbol>
+
+        <symbol id="i-sales" viewBox="0 0 24 24">
+            <polyline points="3 17 9 11 13 15 21 7"/>
+            <polyline points="15 7 21 7 21 13"/>
+        </symbol>
+
+        <symbol id="i-pos" viewBox="0 0 24 24">
+            <rect x="3" y="4" width="18" height="12" rx="2"/>
+            <path d="M8 20h8M12 16v4"/>
+        </symbol>
+
+        <symbol id="i-box" viewBox="0 0 24 24">
+            <path d="M21 8l-9-5-9 5v8l9 5 9-5z"/>
+            <path d="M3 8l9 5 9-5M12 13v8"/>
+        </symbol>
+
+        <symbol id="i-layers" viewBox="0 0 24 24">
+            <polygon points="12 2 2 7 12 12 22 7"/>
+            <polyline points="2 17 12 22 22 17"/>
+            <polyline points="2 12 12 17 22 12"/>
+        </symbol>
+
+        <symbol id="i-users" viewBox="0 0 24 24">
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M2 21a7 7 0 0 1 14 0M16 3.1a4 4 0 0 1 0 7.8M22 21a7 7 0 0 0-4-6.3"/>
+        </symbol>
+
+        <symbol id="i-bag" viewBox="0 0 24 24">
+            <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+            <path d="M3 6h18M16 10a4 4 0 0 1-8 0"/>
+        </symbol>
+
+        <symbol id="i-return" viewBox="0 0 24 24">
+            <polyline points="1 4 1 10 7 10"/>
+            <path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/>
+        </symbol>
+
+        <symbol id="i-brief" viewBox="0 0 24 24">
+            <rect x="2" y="7" width="20" height="14" rx="2"/>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+        </symbol>
+
+        <symbol id="i-card" viewBox="0 0 24 24">
+            <rect x="1" y="4" width="22" height="16" rx="2"/>
+            <path d="M1 10h22"/>
+        </symbol>
+
+        <symbol id="i-bars" viewBox="0 0 24 24">
+            <path d="M18 20V10M12 20V4M6 20v-6"/>
+        </symbol>
+
+        <symbol id="i-building" viewBox="0 0 24 24">
+            <path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4M9 9v.01M9 13v.01M9 17v.01"/>
+        </symbol>
+
+        <symbol id="i-sliders" viewBox="0 0 24 24">
+            <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>
+        </symbol>
+
+        <symbol id="i-bell" viewBox="0 0 24 24">
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/>
+        </symbol>
+
+        <symbol id="i-search" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+        </symbol>
+
+        <symbol id="i-menu" viewBox="0 0 24 24">
+            <path d="M3 6h18M3 12h18M3 18h18"/>
+        </symbol>
+
+    </defs>
+</svg>
+
+
+<div class="layout">
+
+    <!-- ===== SIDEBAR ===== -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="logo">
+            <div class="logo-mark">
+                <svg class="icon">
+                    <use href="#i-cart"/>
+                </svg>
+            </div>
+
+            <span class="logo-text">RetailFlow</span>
+        </div>
+
+        <div class="company-box">
+            <div class="company-name">
+                Your company
+            </div>
+            <div class="company-role">
+                Administrator
+            </div>
+        </div>
+
+        <nav class="menu">
+
+            <div class="menu-title">Main Menu</div>
+
+            <a href="#" class="menu-item active">
+                <svg class="icon">
+                    <use href="#i-dash"/>
+                </svg>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="#" class="menu-item">
+                <svg class="icon">
+                    <use href="#i-sales"/>
+                </svg>
+                <span>Sales</span>
+            </a>
+
+            <a href="#" class="menu-item">
+                <svg class="icon">
+                    <use href="#i-pos"/>
+                </svg>
+                <span>POS</span>
+            </a>
+
+            <a href="#"
+               class="menu-item">
+                <svg class="icon">
+                    <use href="#i-box"/>
+                </svg>
+                <span>Products</span>
+            </a>
+
+            <a href="#"
+               class="menu-item">
+                <svg class="icon">
+                    <use href="#i-layers"/>
+                </svg>
+                <span>Inventory</span>
+            </a>
+
+            <a href="#" class="menu-item">
+                <svg class="icon">
+                    <use href="#i-users"/>
+                </svg>
+                <span>Customers</span>
+            </a>
+
+            <a href="#" class="menu-item">
+                <svg class="icon">
+                    <use href="#i-bag"/>
+                </svg>
+                <span>Purchases</span>
+            </a>
+
+            <a href="#" class="menu-item">
+                <svg class="icon">
+                    <use href="#i-return"/>
+                </svg>
+                <span>Returns</span>
+            </a>
+
+            <a href="#"
+               class="menu-item">
+                <svg class="icon">
+                    <use href="#i-brief"/>
+                </svg>
+                <span>Employees</span>
+            </a>
+
+            <!-- ===== BRANCHES: NEW LINK ===== -->
+
+            <a href="#"
+               class="menu-item">
+                <svg class="icon">
+                    <use href="#i-building"/>
+                </svg>
+                <span>Branches</span>
+            </a>
+
+            <!-- ===== END BRANCH LINK ===== -->
+
+            <a href="#" class="menu-item">
+                <svg class="icon">
+                    <use href="#i-card"/>
+                </svg>
+                <span>Expenses</span>
+            </a>
+
+            <a href="#" class="menu-item">
+                <svg class="icon">
+                    <use href="#i-bars"/>
+                </svg>
+                <span>Reports</span>
+            </a>
+
+            <div class="menu-title">Settings</div>
+
+            <a href="#" class="menu-item">
+                <svg class="icon">
+                    <use href="#i-building"/>
+                </svg>
+                <span>Company Settings</span>
+            </a>
+
+            <a href="#" class="menu-item">
+                <svg class="icon">
+                    <use href="#i-sliders"/>
+                </svg>
+                <span>Business Settings</span>
+            </a>
+
+        </nav>
+
+    </aside>
+
+    <!-- ===== MAIN ===== -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div class="left-top">
+
+                <button class="toggle-btn"
+                        onclick="toggleSidebar()"
+                        aria-label="Toggle sidebar">
+                    <svg class="icon">
+                        <use href="#i-menu"/>
+                    </svg>
+                </button>
+
+                <div class="search-box">
+                    <svg class="icon">
+                        <use href="#i-search"/>
+                    </svg>
+
+                    <input type="text"
+                           placeholder="Search navigation...">
+                </div>
+
+            </div>
+
+            <div class="user-area">
+
+                <div class="notification">
+                    <svg class="icon">
+                        <use href="#i-bell"/>
+                    </svg>
+                </div>
+
+                <div class="user">
+
+                    <div class="avatar">
+                        A
+                    </div>
+
+                    <div class="user-info">
+                        <strong>
+                            Administrator
+                        </strong>
+                        <small>Administrator</small>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+        <div class="preview-note">DESIGN PROPOSAL 02 · ERP overview · All figures are illustrative</div><section class="content" id="screen">
+<div class="page-header"><div><div class="kicker">Administrator workspace · Company-wide overview</div><h1>Admin dashboard</h1><p>Monitor business performance, oversee your team, and manage every branch.</p></div><div class="actions"><span class="date-box">26 OCT 2026</span><a class="button" href="#reports"><svg class="icon" aria-hidden="true"><use href="#i-bars"/></svg> View reports</a></div></div>
+<div class="stats"><a href="#sales" class="card stat-link"><div class="stat-top"><span class="stat-title">Today's sales</span><svg class="icon" aria-hidden="true"><use href="#i-sales"/></svg></div><div class="stat-value">₹24,850</div><div class="stat-change">32 orders today ↗</div></a><a href="#customers" class="card stat-link"><div class="stat-top"><span class="stat-title">Receivables</span><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg></div><div class="stat-value">₹18,400</div><div class="stat-change">8 unpaid invoices ↗</div></a><a href="#purchases" class="card stat-link"><div class="stat-top"><span class="stat-title">Payables</span><svg class="icon" aria-hidden="true"><use href="#i-bag"/></svg></div><div class="stat-value">₹32,600</div><div class="stat-change">5 supplier bills ↗</div></a><a href="#expenses" class="card stat-link"><div class="stat-top"><span class="stat-title">Today's expenses</span><svg class="icon" aria-hidden="true"><use href="#i-card"/></svg></div><div class="stat-value">₹3,250</div><div class="stat-change">4 recorded expenses ↗</div></a></div><div class="erp-strip"><a href="#products"><span>Products</span><strong>248 <span style="font-size:11px">↗</span></strong></a><a href="#inventory"><span>Stock units</span><strong>3,842 <span style="font-size:11px">↗</span></strong></a><a href="#employees"><span>Employees</span><strong>18 <span style="font-size:11px">↗</span></strong></a><a href="#branches"><span>Branches</span><strong>4 <span style="font-size:11px">↗</span></strong></a></div>
+<div class="erp-main"><article class="card"><div class="card-header"><h3>Sales performance</h3><a href="#sales">Sales details →</a></div><div class="chart-total"><strong>₹1,46,800</strong><span>20–26 October · Last 7 days</span></div><div class="trend" role="img" aria-label="Sample daily sales from October 20 to 26: 14200, 18600, 16850, 22100, 27900, 22300, 24850 rupees"><div class="axis"><span>₹30k</span><span>₹15k</span><span>₹0</span></div><div class="line-plot"><svg viewBox="0 0 580 100" preserveAspectRatio="none" aria-hidden="true"><path class="line-grid" d="M14 0H566 M14 50H566 M14 100H566"/><polyline class="sales-line" points="14,52.67 106,38.00 198,43.83 290,26.33 382,7.00 474,25.67 566,17.17"/></svg><div class="line-labels"><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span><span>Mon</span></div></div></div></article>
+<article class="card attention"><div class="card-header"><h3>Needs your attention</h3><span class="pill">3 priorities</span></div><a class="alert-row" href="#inventory"><div><strong>Stock needs replenishment</strong><small>20 low stock · 10 out of stock</small></div><span class="pill">30 items →</span></a><a class="alert-row" href="#purchases"><div><strong>Supplier bills due</strong><small>Review payments due today</small></div><span class="pill">₹12,600 →</span></a><a class="alert-row" href="#customers"><div><strong>Customer invoices overdue</strong><small>Follow up on 3 unpaid invoices</small></div><span class="pill">₹7,200 →</span></a></article></div>
+<div class="erp-bottom"><article class="card"><div class="card-header"><h3>Latest transactions</h3><a href="#sales">View sales →</a></div><div class="table-wrapper"><table><thead><tr><th>Reference</th><th>Type</th><th>Party</th><th class="numeric">Amount</th><th>Status</th></tr></thead><tbody><tr><td>INV-1048</td><td>Sale</td><td>Walk-in customer</td><td class="numeric">₹2,450</td><td><span class="pill">Paid</span></td></tr><tr><td>PO-0286</td><td>Purchase</td><td>Freshline Supplies</td><td class="numeric">₹12,600</td><td><span class="pill">Due today</span></td></tr><tr><td>EXP-0094</td><td>Expense</td><td>Store utilities</td><td class="numeric">₹850</td><td><span class="pill">Paid</span></td></tr></tbody></table></div></article>
+<article class="card"><div class="card-header"><h3>Admin controls</h3><a href="#reports">Reports →</a></div><div class="metric-row"><span>Inventory purchase value</span><strong>₹4,86,250</strong></div><div class="metric-row"><span>Pending purchase orders</span><a href="#purchases">6 orders →</a></div><div class="metric-row"><span>Returns awaiting review</span><a href="#returns">2 returns →</a></div><div class="quick-actions"><a class="button secondary" href="#branches">Branches</a><a class="button secondary" href="#employees">Employees</a><a class="button secondary" href="#company-settings">Settings</a></div></article></div>
+<p class="footer-note">All values are sample data. Select a sidebar module for its detailed page. Sales, finance, and other planned modules require backend implementation.</p></section></main></div><script>
+const modules = {"sales": ["Sales", "Review invoices, payments, and daily sales.", ["Invoice", "Customer", "Amount", "Status"], [["INV-1048", "Walk-in customer", "₹2,450", "Paid"], ["INV-1047", "Anita Stores", "₹4,800", "Unpaid"], ["INV-1046", "Walk-in customer", "₹1,200", "Paid"]], [["Sales today", "₹24,850"], ["Orders today", "32"], ["Unpaid invoices", "8"]]], "pos": ["POS", "A proposed checkout workspace for counter sales.", ["Product", "Price", "Available", "Category"], [["Basmati Rice · 5 kg", "₹620", "4 units", "Groceries"], ["Toor Dal · 1 kg", "₹160", "86 units", "Groceries"], ["Whole Wheat Flour · 5 kg", "₹280", "6 units", "Groceries"]], [["Cart items", "0"], ["Subtotal", "₹0"], ["Total", "₹0"]]], "products": ["Products", "Manage your product catalog, pricing, and categories.", ["Product", "SKU", "Selling price", "Status"], [["Basmati Rice · 5 kg", "SKU-RC-005", "₹620", "Active"], ["Sunflower Oil · 1 L", "SKU-OL-001", "₹145", "Active"], ["Toor Dal · 1 kg", "SKU-DL-001", "₹160", "Active"]], [["Active products", "248"], ["Categories", "12"], ["Inactive products", "8"]]], "inventory": ["Inventory", "Company-wide stock levels and replenishment priorities.", ["Product", "Available", "Minimum", "Status"], [["Basmati Rice · 5 kg", "4", "10", "Low stock"], ["Sunflower Oil · 1 L", "0", "15", "Out of stock"], ["Whole Wheat Flour · 5 kg", "6", "10", "Low stock"], ["Toor Dal · 1 kg", "86", "10", "Healthy"]], [["Stock units", "3,842"], ["Low stock", "20"], ["Out of stock", "10"]]], "customers": ["Customers", "Customer balances and outstanding invoices.", ["Customer", "Outstanding", "Overdue", "Status"], [["Anita Stores", "₹4,800", "₹4,800", "Follow up"], ["City Mart", "₹6,400", "₹2,400", "Follow up"], ["Other customers", "₹7,200", "₹0", "Within terms"]], [["Receivables", "₹18,400"], ["Overdue balance", "₹7,200"], ["Unpaid invoices", "8"]]], "purchases": ["Purchases", "Track supplier orders, deliveries, and payments.", ["Order", "Supplier", "Amount", "Status"], [["PO-0286", "Freshline Supplies", "₹12,600", "Due today"], ["PO-0285", "Harvest Wholesale", "₹8,400", "Ordered"], ["PO-0284", "Daily Essentials", "₹11,600", "Awaiting delivery"]], [["Pending orders", "6"], ["Payables", "₹32,600"], ["Due today", "₹12,600"]]], "returns": ["Returns", "Review customer returns and refund requests.", ["Reference", "Original invoice", "Amount", "Status"], [["RET-0041", "INV-1031", "₹620", "Awaiting review"], ["RET-0040", "INV-1028", "₹280", "Awaiting review"]], [["Pending review", "2"], ["Requested refunds", "₹900"], ["Resolved today", "0"]]], "employees": ["Employees", "Your team, assigned roles, and online status.", ["Employee", "ID", "Role", "Status"], [["Asha Kumar", "ID001", "Manager", "Online"], ["Ravi Shah", "ID002", "Cashier", "Online"], ["Neha Patel", "ID003", "Inventory Staff", "Offline"]], [["Team members", "18"], ["Online", "6"], ["Offline", "12"]]], "branches": ["Branches", "Stores, outlets, and warehouses in your company.", ["Branch", "Code", "Type", "Status"], [["Main Store", "BR-001", "Retail Store", "Active"], ["City Outlet", "BR-002", "Outlet", "Active"], ["Central Warehouse", "BR-003", "Warehouse", "Active"], ["North Store", "BR-004", "Retail Store", "Active"]], [["Active branches", "4"], ["Retail stores", "2"], ["Warehouses", "1"]]], "expenses": ["Expenses", "Review business expenses and payment records.", ["Reference", "Category", "Amount", "Status"], [["EXP-0094", "Store utilities", "₹850", "Paid"], ["EXP-0093", "Transport", "₹1,200", "Paid"], ["EXP-0092", "Packaging", "₹700", "Paid"], ["EXP-0091", "Maintenance", "₹500", "Paid"]], [["Today's expenses", "₹3,250"], ["Entries today", "4"], ["Unpaid today", "₹0"]]], "reports": ["Reports", "A central place for business and operational reports.", ["Report", "Coverage", "Period", "Preview status"], [["Sales summary", "Revenue and orders", "Last 7 days", "Sample available"], ["Inventory valuation", "Company-wide inventory", "Current snapshot", "Sample available"], ["Receivables aging", "Customer balances", "Current snapshot", "Sample available"]], [["Weekly sales", "₹1,46,800"], ["Stock value", "₹4,86,250"], ["Receivables", "₹18,400"]]], "company-settings": ["Company Settings", "Company identity and operating preferences.", ["Setting", "Sample value"], [["Company", "Your company"], ["Country", "India"], ["Currency", "INR"], ["Account role", "Administrator"]], [["Company", "1"], ["Branches", "4"], ["Currency", "INR"]]], "business-settings": ["Business Settings", "Proposed controls for everyday business operations.", ["Setting", "Sample value"], [["Default currency", "INR"], ["Stock alert rule", "Per-product minimum"], ["Invoice prefix", "INV"], ["Purchase order prefix", "PO"]], [["Currency", "INR"], ["Stock alerts", "Enabled"], ["Invoice prefix", "INV"]]]};
+const screen = document.getElementById('screen');
+const overview = screen.innerHTML;
+function toggleSidebar(){const s=document.getElementById('sidebar');s.classList.toggle('collapsed');document.querySelector('.toggle-btn').setAttribute('aria-expanded',String(!s.classList.contains('collapsed')))}
+const slug = text => text.trim().toLowerCase().replaceAll(' ','-');
+document.querySelectorAll('.menu-item').forEach(a=>{const name=a.textContent.trim();a.href='#'+slug(name);a.title=name;a.setAttribute('aria-label',name)});
+function render(){
+ const key=location.hash.slice(1)||'dashboard';
+ const info=modules[key];
+ if(!info){screen.innerHTML=overview;document.title='Admin dashboard | RetailFlow preview'}
+ else {
+  const [name,description,columns,rows,stats]=info;
+  const cards=stats.map(([label,value])=>'<article class="card"><div class="stat-title">'+label+'</div><div class="stat-value">'+value+'</div></article>').join('');
+  const heads=columns.map(c=>'<th>'+c+'</th>').join('');
+  const body=rows.map(row=>'<tr>'+row.map(cell=>'<td>'+cell+'</td>').join('')+'</tr>').join('');
+  screen.innerHTML='<div class="module-heading"><a class="card-header" href="#dashboard">← Business overview</a><div class="kicker">Administrator workspace</div><h1>'+name+'</h1><p>'+description+'</p></div><span class="pill module-label">Interactive layout proposal · Sample data</span><div class="stats">'+cards+'</div><article class="card"><div class="card-header"><h3>'+name+' overview</h3><span class="muted" style="font-size:11px">Sample records</span></div><div class="table-wrapper"><table><thead><tr>'+heads+'</tr></thead><tbody>'+body+'</tbody></table></div></article><p class="footer-note">This is a navigation and layout mockup. Data entry, payments, checkout, and backend connections are not implemented.</p>';
+  document.title=name+' | RetailFlow preview';
+ }
+ document.querySelectorAll('.menu-item').forEach(a=>{const active=a.hash==='#'+(info?key:'dashboard');a.classList.toggle('active',active);if(active)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+ window.scrollTo(0,0);
+ if(location.hash){const heading=screen.querySelector('h1');heading.tabIndex=-1;heading.focus({preventScroll:true})}
+}
+window.addEventListener('hashchange',render);render();
+document.querySelector('.search-box input').setAttribute('aria-label','Search sidebar modules');
+document.querySelector('.search-box input').addEventListener('input',e=>document.querySelectorAll('.menu-item').forEach(a=>a.hidden=!a.textContent.toLowerCase().includes(e.target.value.toLowerCase())));
+</script></body></html>

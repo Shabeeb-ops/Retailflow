@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Receipt {{ sale.sale_number }} - Print</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 10px;
+            background: #fff;
+            display: flex;
+            justify-content: center;
+        }
+        @media print {
+            body { padding: 0; }
+        }
+    </style>
+</head>
+<body>
+    {% include "pos/receipt.html" %}
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                window.print();
+            }, 300);
+        });
+    </script>
+</body>
+</html>
+

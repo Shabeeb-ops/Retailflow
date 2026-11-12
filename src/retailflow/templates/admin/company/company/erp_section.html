@@ -1,0 +1,290 @@
+
+{% extends "admin/base_site.html" %}
+
+{% block title %}
+    {{ title }} | RetailFlow ERP
+{% endblock %}
+
+{% block content %}
+
+<style>
+    .rf-page {
+        max-width: 1150px;
+        margin: 0 auto;
+    }
+
+    .rf-page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 24px;
+    }
+
+    .rf-page-header h1 {
+        margin: 0 0 6px;
+        font-size: 26px;
+        color: var(--body-fg, #222);
+    }
+
+    .rf-subtitle {
+        margin: 0;
+        color: var(--body-quiet-color, #666);
+    }
+
+    .rf-back-link {
+        display: inline-block;
+        padding: 10px 15px;
+        border: 1px solid var(--hairline-color, #ddd);
+        border-radius: 7px;
+        color: var(--link-fg, #417690);
+        text-decoration: none;
+    }
+
+    .rf-search-panel {
+        background: var(--darkened-bg, #f8fafc);
+        padding: 18px;
+        border: 1px solid var(--hairline-color, #ddd);
+        border-radius: 10px;
+        margin-bottom: 22px;
+    }
+
+    .rf-search-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .rf-search-input {
+        flex: 1;
+        min-width: 220px;
+        padding: 11px;
+        border-radius: 6px;
+        border: 1px solid var(--hairline-color, #ccc);
+        background: var(--body-bg, #fff);
+        color: var(--body-fg, #222);
+    }
+
+    .rf-search-button {
+        padding: 10px 20px;
+        border: 0;
+        border-radius: 6px;
+        background: var(--button-bg, #417690);
+        color: white;
+        cursor: pointer;
+    }
+
+    .rf-table-wrapper {
+        overflow-x: auto;
+        border: 1px solid var(--hairline-color, #ddd);
+        border-radius: 10px;
+    }
+
+    .rf-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .rf-table th {
+        background: var(--darkened-bg, #f8fafc);
+        padding: 15px;
+        text-align: left;
+        font-weight: 700;
+    }
+
+    .rf-table td {
+        padding: 14px 15px;
+        border-top: 1px solid var(--hairline-color, #ddd);
+        vertical-align: middle;
+    }
+
+    .rf-table a {
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .rf-table a:hover {
+        text-decoration: underline;
+    }
+
+    .rf-muted {
+        color: var(--body-quiet-color, #666);
+        font-size: 12px;
+    }
+
+    .rf-empty {
+        text-align: center;
+        padding: 45px 20px !important;
+        color: var(--body-quiet-color, #666);
+    }
+
+    .rf-pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .rf-page-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .rf-page-links a {
+        padding: 7px 12px;
+        border: 1px solid var(--hairline-color, #ddd);
+        border-radius: 5px;
+        text-decoration: none;
+    }
+</style>
+
+<div class="rf-page">
+
+    <div class="rf-page-header">
+
+        <div>
+            <h1>{{ section_label }}</h1>
+
+            <p class="rf-subtitle">
+                Company:
+                <strong>{{ company.company_name }}</strong>
+            </p>
+        </div>
+
+        <a href="{{ overview_url }}" class="rf-back-link">
+            Back to Company Workspace
+        </a>
+
+    </div>
+
+    <div class="rf-search-panel">
+
+        <form method="get" class="rf-search-form">
+
+            <input
+                type="search"
+                name="q"
+                value="{{ search_query }}"
+                placeholder="Search {{ section_label|lower }}..."
+                class="rf-search-input"
+            >
+
+            <button type="submit" class="rf-search-button">
+                Search
+            </button>
+
+            {% if search_query %}
+                <a href="?" class="rf-back-link">
+                    Clear
+                </a>
+            {% endif %}
+
+        </form>
+
+    </div>
+
+    <div class="rf-table-wrapper">
+
+        <table class="rf-table">
+
+            <thead>
+                <tr>
+                    <th>Record</th>
+                    <th>Details</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for row in rows %}
+
+                    <tr>
+                        <td>
+                            <strong>{{ row.title }}</strong>
+                        </td>
+
+                        <td>
+                            <span class="rf-muted">
+                                {{ row.details }}
+                            </span>
+                        </td>
+
+                        <td>
+                            {% if row.url %}
+                                <a href="{{ row.url }}">
+                                    View Details
+                                </a>
+                            {% else %}
+                                <span class="rf-muted">
+                                    Unavailable
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                {% empty %}
+
+                    <tr>
+                        <td colspan="3" class="rf-empty">
+                            No records found for this company.
+                        </td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+
+        <div class="rf-pagination">
+
+            <span class="rf-muted">
+                Page {{ page_obj.number }}
+                of {{ page_obj.paginator.num_pages }}
+            </span>
+
+            <div class="rf-page-links">
+
+                {% if page_obj.has_previous %}
+
+                    <a href="?q={{ search_query|urlencode }}&page=1">
+                        First
+                    </a>
+
+                    <a href="?q={{ search_query|urlencode }}&page={{ page_obj.previous_page_number }}">
+                        Previous
+                    </a>
+
+                {% endif %}
+
+                {% if page_obj.has_next %}
+
+                    <a href="?q={{ search_query|urlencode }}&page={{ page_obj.next_page_number }}">
+                        Next
+                    </a>
+
+                    <a href="?q={{ search_query|urlencode }}&page={{ page_obj.paginator.num_pages }}">
+                        Last
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

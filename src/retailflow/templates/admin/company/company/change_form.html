@@ -1,0 +1,133 @@
+
+{% extends "admin/change_form.html" %}
+
+{% block after_field_sets %}
+    {{ block.super }}
+
+    {% if rf_sections %}
+
+    <style>
+        .rf-workspace {
+            margin: 28px 0;
+            padding: 24px;
+            background: var(--body-bg, #fff);
+            border: 1px solid var(--hairline-color, #ddd);
+            border-radius: 12px;
+        }
+
+        .rf-workspace-header {
+            margin-bottom: 22px;
+        }
+
+        .rf-workspace-header h2 {
+            font-size: 22px;
+            font-weight: 700;
+            margin: 0 0 8px;
+            color: var(--body-fg, #222);
+        }
+
+        .rf-workspace-header p {
+            color: var(--body-quiet-color, #666);
+            margin: 0;
+        }
+
+        .rf-card-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(210px, 1fr));
+            gap: 16px;
+        }
+
+        .rf-card {
+            display: block;
+            padding: 22px;
+            border: 1px solid var(--hairline-color, #ddd);
+            border-radius: 10px;
+            background: var(--darkened-bg, #f8fafc);
+            color: var(--body-fg, #222);
+            text-decoration: none;
+            transition: transform .15s, box-shadow .15s;
+        }
+
+        .rf-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 16px rgba(0, 0, 0, .10);
+            border-color: var(--link-fg, #417690);
+        }
+
+        .rf-card-label {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .rf-card-count {
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--link-fg, #417690);
+        }
+
+        .rf-card-description {
+            font-size: 12px;
+            margin-top: 10px;
+            color: var(--body-quiet-color, #666);
+        }
+
+        .rf-workspace-footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: var(--body-quiet-color, #666);
+        }
+    </style>
+
+    <div class="rf-workspace">
+
+        <div class="rf-workspace-header">
+            <h2>RetailFlow Company ERP Workspace</h2>
+
+            <p>
+                Company:
+                <strong>{{ original.company_name }}</strong>
+            </p>
+
+            <p>
+                View employees, products, inventory
+                and business records for this company.
+            </p>
+        </div>
+
+        <div class="rf-card-grid">
+
+            {% for section in rf_sections %}
+
+                <a href="{{ section.url }}" class="rf-card">
+
+                    <div class="rf-card-label">
+                        {{ section.label }}
+                    </div>
+
+                    <div class="rf-card-count">
+                        {{ section.count }}
+                    </div>
+
+                    <div class="rf-card-description">
+                        View {{ section.label|lower }} records
+                    </div>
+
+                </a>
+
+            {% endfor %}
+
+        </div>
+
+        <div class="rf-workspace-footer">
+            Company-specific ERP records.
+            Available to authorized system administrators.
+        </div>
+
+    </div>
+
+    {% endif %}
+
+{% endblock %}

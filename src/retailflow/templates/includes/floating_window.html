@@ -1,0 +1,1364 @@
+<style>
+/* ==========================================================================
+   RetailFlow Reusable Floating Window Component Styles
+   ========================================================================== */
+
+#rf-window-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.rf-window {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border: 1px solid var(--line, #dedbd0);
+    border-radius: 10px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.16), 0 2px 8px rgba(0, 0, 0, 0.08);
+    pointer-events: auto;
+    overflow: hidden;
+    min-width: 380px;
+    min-height: 240px;
+    outline: none;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.rf-window.is-focused {
+    border-color: #0d0d0d;
+    box-shadow: 0 22px 50px rgba(0, 0, 0, 0.24), 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.rf-window.is-maximized {
+    top: 8px !important;
+    left: 8px !important;
+    width: calc(100vw - 16px) !important;
+    height: calc(100vh - 16px) !important;
+    border-radius: 6px !important;
+}
+
+.rf-window.is-minimized {
+    display: none !important;
+}
+
+/* Header & Title bar */
+.rf-window-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 14px;
+    background: #f4f3ee; /* RetailFlow cream */
+    border-bottom: 1px solid var(--line, #dedbd0);
+    user-select: none;
+    cursor: move;
+    height: 38px;
+    flex-shrink: 0;
+}
+
+.rf-window.is-maximized .rf-window-header {
+    cursor: default;
+}
+
+.rf-window-title-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+}
+
+.rf-window-icon {
+    display: inline-flex;
+    align-items: center;
+    color: var(--ink, #0d0d0d);
+    flex-shrink: 0;
+}
+
+.rf-window-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink, #0d0d0d);
+    margin: 0;
+    letter-spacing: -0.01em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Header Action Buttons */
+.rf-window-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 12px;
+    flex-shrink: 0;
+}
+
+.rf-win-btn {
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    color: var(--ink, #0d0d0d);
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.rf-win-btn:hover {
+    background: #e6e4dc;
+    border-color: #d8d5cb;
+}
+
+.rf-win-btn.rf-win-close:hover {
+    background: #fee2e2;
+    border-color: #fca5a5;
+    color: #b91c1c;
+}
+
+.rf-win-btn svg {
+    width: 13px;
+    height: 13px;
+}
+
+/* Window Body */
+.rf-window-body {
+    flex: 1;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 12px 16px !important;
+    background: #ffffff;
+    display: block !important;
+}
+
+/* Scoped Compact Form Rules for Popup Window Content */
+.rf-window-body .form-container,
+.rf-window-body .supplier-form,
+.rf-window-body .purchase-form {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+}
+
+.rf-window-body .card,
+.rf-window-body .form-card {
+    padding: 12px 14px !important;
+    margin-bottom: 0 !important;
+    border-radius: 8px !important;
+}
+
+.rf-window-body .form-header,
+.rf-window-body .supplier-header,
+.rf-window-body .purchase-heading {
+    margin-bottom: 8px !important;
+}
+
+.rf-window-body .form-header h1,
+.rf-window-body .supplier-header h1,
+.rf-window-body .purchase-heading h1,
+.rf-window-body h1 {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    margin: 0 0 2px 0 !important;
+    letter-spacing: -0.01em !important;
+}
+
+.rf-window-body .form-header p,
+.rf-window-body .supplier-muted,
+.rf-window-body .purchase-muted,
+.rf-window-body .subtitle,
+.rf-window-body p {
+    font-size: 11px !important;
+    margin: 0 0 6px 0 !important;
+    line-height: 1.3 !important;
+}
+
+.rf-window-body .form-group,
+.rf-window-body .field,
+.rf-window-body .purchase-field,
+.rf-window-body .supplier-field {
+    margin-bottom: 6px !important;
+}
+
+.rf-window-body .form-group label,
+.rf-window-body .field label,
+.rf-window-body .purchase-field label,
+.rf-window-body .supplier-field label {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    margin-bottom: 3px !important;
+    display: block !important;
+}
+
+.rf-window-body input:not([type="checkbox"]),
+.rf-window-body select {
+    height: 32px !important;
+    padding: 4px 10px !important;
+    font-size: 13px !important;
+    border: 1px solid var(--line, #dedbd0) !important;
+    border-radius: 6px !important;
+    box-sizing: border-box !important;
+}
+
+.rf-window-body textarea {
+    height: 38px !important;
+    min-height: 34px !important;
+    max-height: 52px !important;
+    padding: 4px 10px !important;
+    font-size: 13px !important;
+    border: 1px solid var(--line, #dedbd0) !important;
+    border-radius: 6px !important;
+    box-sizing: border-box !important;
+    resize: none !important;
+    line-height: 1.3 !important;
+}
+
+.rf-window-body fieldset {
+    border: 0 !important;
+    padding: 0 !important;
+    margin: 0 0 8px 0 !important;
+}
+
+.rf-window-body legend {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    margin: 0 0 6px 0 !important;
+    padding: 0 !important;
+    color: var(--ink, #0d0d0d) !important;
+}
+
+.rf-window-body .checkbox-row,
+.rf-window-body .rf-checkbox-field {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    height: 32px !important;
+    margin-top: auto !important;
+}
+
+.rf-window-body .checkbox-row input[type="checkbox"],
+.rf-window-body .rf-checkbox-field input[type="checkbox"] {
+    width: 15px !important;
+    height: 15px !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+}
+
+.rf-window-body .checkbox-row label,
+.rf-window-body .rf-checkbox-field label {
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    margin: 0 !important;
+    cursor: pointer !important;
+}
+
+.rf-window-body .form-actions,
+.rf-window-body .supplier-actions,
+.rf-window-body .purchase-actions {
+    margin-top: 10px !important;
+    padding-top: 8px !important;
+    border-top: 1px solid var(--line, #dedbd0) !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 10px !important;
+}
+
+.rf-window-body .button,
+.rf-window-body button {
+    height: 32px !important;
+    padding: 0 16px !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    border-radius: 6px !important;
+}
+
+.rf-window-body .purchase-table,
+.rf-window-body .supplier-table,
+.rf-window-body .table-card,
+.rf-window-body .card.purchase-table,
+.rf-window-body .table-container,
+.rf-window-body .table-responsive,
+.rf-window-body [class*="table"] {
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    min-height: min-content !important;
+    height: auto !important;
+    max-height: none !important;
+    flex-shrink: 0 !important;
+    width: 100% !important;
+    margin-bottom: 12px !important;
+}
+
+.rf-window-body table,
+.rf-window-body tbody,
+.rf-window-body thead,
+.rf-window-body tr {
+    height: auto !important;
+    min-height: min-content !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+.rf-window-body table {
+    width: 100% !important;
+    min-width: 600px;
+    border-collapse: collapse;
+    height: auto !important;
+    display: table !important;
+}
+
+.rf-window-body th,
+.rf-window-body td {
+    padding: 8px 10px !important;
+    text-align: left;
+    height: auto !important;
+    font-size: 12px !important;
+    line-height: 1.4 !important;
+}
+
+.rf-window-body th {
+    background: var(--cream, #f4f3ee) !important;
+    color: var(--muted, #6d6b63) !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
+}
+
+.rf-window-body td {
+    border-bottom: 1px solid var(--line, #dedbd0) !important;
+    font-size: 12px !important;
+    color: var(--ink, #0d0d0d) !important;
+}
+
+.rf-window-body .purchase-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    background: var(--cream, #f4f3ee);
+    border-radius: 6px;
+}
+.rf-window-body .purchase-summary dt {
+    font-size: 10px;
+    color: var(--muted, #6d6b63);
+    margin-bottom: 2px;
+    text-transform: uppercase;
+}
+.rf-window-body .purchase-summary dd {
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.rf-window-body .purchase-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    margin-bottom: 20px;
+}
+
+.rf-window-body .purchase-info {
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+    margin-bottom: 16px;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+/* Loading state */
+.rf-window-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    color: var(--muted, #6d6b63);
+    gap: 12px;
+    font-size: 13px;
+}
+
+.rf-spinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid var(--line, #dedbd0);
+    border-top-color: var(--ink, #0d0d0d);
+    border-radius: 50%;
+    animation: rf-spin 0.8s linear infinite;
+}
+
+@keyframes rf-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Resize Handles */
+.rf-resize-handle {
+    position: absolute;
+    z-index: 10;
+}
+.rf-resize-n { top: -4px; left: 6px; right: 6px; height: 8px; cursor: n-resize; }
+.rf-resize-s { bottom: -4px; left: 6px; right: 6px; height: 8px; cursor: s-resize; }
+.rf-resize-e { top: 6px; bottom: 6px; right: -4px; width: 8px; cursor: e-resize; }
+.rf-resize-w { top: 6px; bottom: 6px; left: -4px; width: 8px; cursor: w-resize; }
+.rf-resize-ne { top: -4px; right: -4px; width: 12px; height: 12px; cursor: ne-resize; }
+.rf-resize-nw { top: -4px; left: -4px; width: 12px; height: 12px; cursor: nw-resize; }
+.rf-resize-se { bottom: 0; right: 0; width: 16px; height: 16px; cursor: se-resize; }
+.rf-resize-sw { bottom: -4px; left: -4px; width: 12px; height: 12px; cursor: sw-resize; }
+
+.rf-resize-se::after {
+    content: "";
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    width: 7px;
+    height: 7px;
+    border-right: 2px solid #8a8a85;
+    border-bottom: 2px solid #8a8a85;
+}
+
+
+/* Toast Notification inside Dashboard */
+.rf-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--ink, #0d0d0d);
+    color: #ffffff;
+    padding: 12px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    z-index: 1200;
+    opacity: 0;
+    transition: opacity 0.25s, transform 0.25s;
+    pointer-events: none;
+    max-width: 90vw;
+    text-align: center;
+}
+
+.rf-toast.is-visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Reorderable row styling in PO formset */
+.purchase-line.is-dragging {
+    opacity: 0.4;
+    border: 2px dashed #0d0d0d;
+}
+.purchase-line.drop-target-above {
+    border-top: 3px solid #0d0d0d;
+}
+.purchase-line.drop-target-below {
+    border-bottom: 3px solid #0d0d0d;
+}
+
+.rf-row-handle {
+    cursor: grab;
+    user-select: none;
+    font-size: 18px;
+    color: var(--muted, #6d6b63);
+    margin-right: 8px;
+    display: inline-flex;
+    align-items: center;
+}
+.rf-row-handle:active {
+    cursor: grabbing;
+}
+
+/* Mobile responsive fallback */
+@media (max-width: 768px) {
+    .rf-window {
+        top: 10px !important;
+        left: 10px !important;
+        width: calc(100vw - 20px) !important;
+        height: calc(100vh - 20px) !important;
+        max-width: none !important;
+        max-height: none !important;
+        border-radius: 8px !important;
+    }
+    .rf-window-header {
+        cursor: default !important;
+    }
+    .rf-resize-handle {
+        display: none !important;
+    }
+}
+</style>
+
+<div id="rf-window-container"></div>
+<div id="rf-toast" class="rf-toast" role="status" aria-live="polite"></div>
+
+<script>
+/**
+ * RetailFlow Reusable Floating Window Manager
+ * Provides draggable, resizable, minimizable, maximizable desktop-like windows
+ * with AJAX form handling, dirty form protection, and document status guards.
+ */
+window.RetailFlowWindow = (function() {
+    let zIndexCounter = 1010;
+    const windows = {};
+    const container = document.getElementById('rf-window-container');
+    const taskbar = document.getElementById('rf-taskbar');
+    const toast = document.getElementById('rf-toast');
+
+    function showToast(message, duration = 3500) {
+        if (!toast) return;
+        toast.textContent = message;
+        toast.classList.add('is-visible');
+        setTimeout(() => {
+            toast.classList.remove('is-visible');
+        }, duration);
+    }
+
+    function formIsDirty(form) {
+        if (!form) return false;
+        const initial = form.dataset.initialData;
+        if (!initial) return false;
+        const current = new URLSearchParams(new FormData(form)).toString();
+        return initial !== current;
+    }
+
+    function markFormClean(form) {
+        if (!form) return;
+        form.dataset.initialData = new URLSearchParams(new FormData(form)).toString();
+    }
+
+    function bringToFront(winEl) {
+        zIndexCounter += 2;
+        winEl.style.zIndex = zIndexCounter;
+        document.querySelectorAll('.rf-window').forEach(w => w.classList.remove('is-focused'));
+        winEl.classList.add('is-focused');
+    }
+
+    function centerWindow(winEl, targetW, targetH) {
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const w = Math.min(targetW, vw - 30);
+        const h = Math.min(targetH, vh - 30);
+        // Cascade offset if other windows exist
+        const openCount = Object.keys(windows).filter(k => !windows[k].isMinimized).length;
+        const offset = (openCount * 24) % 120;
+        const left = Math.max(10, Math.floor((vw - w) / 2) + offset);
+        const top = Math.max(10, Math.floor((vh - h) / 2) + (offset / 2));
+        winEl.style.width = w + 'px';
+        winEl.style.height = h + 'px';
+        winEl.style.left = left + 'px';
+        winEl.style.top = top + 'px';
+    }
+
+    function initDraggable(winEl, headerEl) {
+        let isDragging = false;
+        let startX, startY, startLeft, startTop;
+
+        function onMouseDown(e) {
+            if (e.target.closest('.rf-win-btn') || winEl.classList.contains('is-maximized')) return;
+            isDragging = true;
+            startX = e.clientX || (e.touches && e.touches[0].clientX);
+            startY = e.clientY || (e.touches && e.touches[0].clientY);
+            const rect = winEl.getBoundingClientRect();
+            startLeft = rect.left;
+            startTop = rect.top;
+            bringToFront(winEl);
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+            document.addEventListener('touchmove', onMouseMove, { passive: false });
+            document.addEventListener('touchend', onMouseUp);
+        }
+
+        function onMouseMove(e) {
+            if (!isDragging) return;
+            if (e.preventDefault) e.preventDefault();
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            const dx = clientX - startX;
+            const dy = clientY - startY;
+
+            let newLeft = startLeft + dx;
+            let newTop = startTop + dy;
+
+            // Boundaries
+            const maxLeft = window.innerWidth - winEl.offsetWidth;
+            const maxTop = window.innerHeight - 44; // keep title bar visible
+
+            newLeft = Math.max(0, Math.min(newLeft, maxLeft));
+            newTop = Math.max(0, Math.min(newTop, maxTop));
+
+            winEl.style.left = newLeft + 'px';
+            winEl.style.top = newTop + 'px';
+        }
+
+        function onMouseUp() {
+            isDragging = false;
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            document.removeEventListener('touchmove', onMouseMove);
+            document.removeEventListener('touchend', onMouseUp);
+        }
+
+        headerEl.addEventListener('mousedown', onMouseDown);
+        headerEl.addEventListener('touchstart', onMouseDown, { passive: true });
+    }
+
+    function initResizable(winEl, minW, minH) {
+        const handles = winEl.querySelectorAll('.rf-resize-handle');
+        handles.forEach(handle => {
+            handle.addEventListener('mousedown', function(e) {
+                if (winEl.classList.contains('is-maximized')) return;
+                e.preventDefault();
+                e.stopPropagation();
+                bringToFront(winEl);
+
+                const dir = this.dataset.dir;
+                const rect = winEl.getBoundingClientRect();
+                const startX = e.clientX;
+                const startY = e.clientY;
+                const startW = rect.width;
+                const startH = rect.height;
+                const startLeft = rect.left;
+                const startTop = rect.top;
+
+                function onResizeMove(moveEvent) {
+                    const dx = moveEvent.clientX - startX;
+                    const dy = moveEvent.clientY - startY;
+
+                    if (dir.includes('e')) {
+                        const newW = Math.max(minW, Math.min(startW + dx, window.innerWidth - startLeft - 10));
+                        winEl.style.width = newW + 'px';
+                    }
+                    if (dir.includes('s')) {
+                        const newH = Math.max(minH, Math.min(startH + dy, window.innerHeight - startTop - 10));
+                        winEl.style.height = newH + 'px';
+                    }
+                    if (dir.includes('w')) {
+                        const newW = Math.max(minW, startW - dx);
+                        if (newW > minW) {
+                            winEl.style.width = newW + 'px';
+                            winEl.style.left = (startLeft + dx) + 'px';
+                        }
+                    }
+                    if (dir.includes('n')) {
+                        const newH = Math.max(minH, startH - dy);
+                        if (newH > minH) {
+                            winEl.style.height = newH + 'px';
+                            winEl.style.top = (startTop + dy) + 'px';
+                        }
+                    }
+                }
+
+                function onResizeUp() {
+                    document.removeEventListener('mousemove', onResizeMove);
+                    document.removeEventListener('mouseup', onResizeUp);
+                }
+
+                document.addEventListener('mousemove', onResizeMove);
+                document.addEventListener('mouseup', onResizeUp);
+            });
+        });
+    }
+
+    function open(options) {
+        const id = options.id || 'rf-win-' + Date.now();
+        if (windows[id]) {
+            // Already open -> restore if minimized and bring to front
+            const existing = windows[id];
+            if (existing.isMinimized) {
+                restore(id);
+            }
+            bringToFront(existing.element);
+            if (options.url) {
+                loadContent(id, options.url, options.onLoad);
+            }
+            return existing;
+        }
+
+        const width = options.width || 820;
+        const height = options.height || 580;
+        const minWidth = options.minWidth || 380;
+        const minHeight = options.minHeight || 240;
+
+        const winEl = document.createElement('div');
+        winEl.id = id;
+        winEl.className = 'rf-window';
+        winEl.setAttribute('role', 'dialog');
+        winEl.setAttribute('aria-modal', 'false');
+        winEl.setAttribute('tabindex', '-1');
+
+        winEl.innerHTML = `
+            <div class="rf-window-header">
+                <div class="rf-window-title-group">
+                    <span class="rf-window-icon">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/>
+                        </svg>
+                    </span>
+                    <h3 class="rf-window-title">${options.title || 'RetailFlow Window'}</h3>
+                </div>
+                <div class="rf-window-actions">
+                    <button type="button" class="rf-win-btn rf-win-max" title="Maximize" aria-label="Maximize">
+                        <svg class="icon-max" viewBox="0 0 16 16"><rect x="3" y="3" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1.8" rx="1"/></svg>
+                        <svg class="icon-restore" style="display:none" viewBox="0 0 16 16"><rect x="5" y="3" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.5"/><rect x="3" y="5" width="8" height="8" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+                    </button>
+                    <button type="button" class="rf-win-btn rf-win-close" title="Close" aria-label="Close">
+                        <svg viewBox="0 0 16 16"><line x1="4" y1="4" x2="12" y2="12" stroke="currentColor" stroke-width="1.8"/><line x1="12" y1="4" x2="4" y2="12" stroke="currentColor" stroke-width="1.8"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="rf-window-body">
+                <div class="rf-window-loading">
+                    <div class="rf-spinner"></div>
+                    <span>Loading...</span>
+                </div>
+            </div>
+            <div class="rf-resize-handle rf-resize-n" data-dir="n"></div>
+            <div class="rf-resize-handle rf-resize-s" data-dir="s"></div>
+            <div class="rf-resize-handle rf-resize-e" data-dir="e"></div>
+            <div class="rf-resize-handle rf-resize-w" data-dir="w"></div>
+            <div class="rf-resize-handle rf-resize-ne" data-dir="ne"></div>
+            <div class="rf-resize-handle rf-resize-nw" data-dir="nw"></div>
+            <div class="rf-resize-handle rf-resize-se" data-dir="se"></div>
+            <div class="rf-resize-handle rf-resize-sw" data-dir="sw"></div>
+        `;
+
+        container.appendChild(winEl);
+        centerWindow(winEl, width, height);
+        bringToFront(winEl);
+
+        const headerEl = winEl.querySelector('.rf-window-header');
+        initDraggable(winEl, headerEl);
+        initResizable(winEl, minWidth, minHeight);
+
+        winEl.addEventListener('mousedown', () => bringToFront(winEl));
+
+        // Controls
+        const maxBtn = winEl.querySelector('.rf-win-max');
+        const closeBtn = winEl.querySelector('.rf-win-close');
+
+        maxBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleMaximize(id); });
+        closeBtn.addEventListener('click', (e) => { e.stopPropagation(); close(id); });
+
+        windows[id] = {
+            id,
+            element: winEl,
+            options,
+            isMinimized: false,
+            isMaximized: false,
+            prevGeometry: null
+        };
+
+        if (options.url) {
+            loadContent(id, options.url, options.onLoad);
+        } else if (options.content) {
+            setContent(id, options.content);
+        }
+
+        return windows[id];
+    }
+
+    function adjustWindowToFit(winId) {
+        const winObj = windows[winId];
+        if (!winObj || winObj.isMaximized) return;
+        const targetWinEl = winObj.element;
+        const targetBodyEl = targetWinEl.querySelector('.rf-window-body');
+        const targetHeaderEl = targetWinEl.querySelector('.rf-window-header');
+        if (!targetBodyEl) return;
+
+        setTimeout(() => {
+            if (winObj.isMaximized) return;
+            const headerH = targetHeaderEl ? targetHeaderEl.offsetHeight : 38;
+            const contentH = targetBodyEl.scrollHeight;
+            const maxAllowedH = Math.floor(window.innerHeight * 0.94);
+            const targetH = Math.min(contentH + headerH + 6, maxAllowedH);
+
+            if (targetH > 180) {
+                targetWinEl.style.height = targetH + 'px';
+                const currentTop = parseInt(targetWinEl.style.top || 0);
+                if (currentTop + targetH > window.innerHeight - 10) {
+                    const newTop = Math.max(10, Math.floor((window.innerHeight - targetH) / 2));
+                    targetWinEl.style.top = newTop + 'px';
+                }
+            }
+        }, 50);
+    }
+
+    function setTitle(id, title) {
+        const win = windows[id];
+        if (!win) return;
+        const titleEl = win.element.querySelector('.rf-window-title');
+        if (titleEl) titleEl.textContent = title;
+        if (win.taskbarItem) {
+            win.taskbarItem.querySelector('.rf-taskbar-item-title').textContent = title;
+        }
+    }
+
+    function setContent(id, content) {
+        const win = windows[id];
+        if (!win) return;
+        const bodyEl = win.element.querySelector('.rf-window-body');
+        if (typeof content === 'string') {
+            bodyEl.innerHTML = content;
+        } else if (content instanceof HTMLElement) {
+            bodyEl.innerHTML = '';
+            bodyEl.appendChild(content);
+        }
+        try {
+            setupPopupInteractions(id);
+        } catch (e) {
+            console.warn('setupPopupInteractions error:', e);
+        }
+        try {
+            adjustWindowToFit(id);
+        } catch (e) {
+            console.warn('adjustWindowToFit error:', e);
+        }
+    }
+
+    function loadContent(id, url, callback) {
+        const win = windows[id];
+        if (!win) return;
+        const bodyEl = win.element.querySelector('.rf-window-body');
+        bodyEl.innerHTML = `
+            <div class="rf-window-loading">
+                <div class="rf-spinner"></div>
+                <span>Loading content...</span>
+            </div>
+        `;
+
+        const sep = url.includes('?') ? '&' : '?';
+        const fetchUrl = url + sep + 'popup=1';
+
+        fetch(fetchUrl, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-RF-Window': '1'
+            }
+        })
+        .then(response => {
+            if (!response.ok && response.status !== 400) {
+                throw new Error('Server returned HTTP ' + response.status);
+            }
+            return response.text();
+        })
+        .then(html => {
+            // If the response is a full page, extract just the content or use as-is
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const popupView = doc.querySelector('.rf-popup-view') || doc.querySelector('.rf-popup-container') || doc.querySelector('main.main') || doc.body;
+
+            // Extract title if available in response
+            const heading = doc.querySelector('.purchase-heading h1, .supplier-header h1, h1');
+            if (heading) {
+                setTitle(id, heading.textContent.trim());
+            }
+
+            const styles = Array.from(doc.querySelectorAll('head style')).map(s => s.outerHTML).join('\n');
+            bodyEl.innerHTML = (styles ? styles + '\n' : '') + (popupView ? popupView.innerHTML : html);
+            try {
+                setupPopupInteractions(id);
+            } catch (e) {
+                console.warn('setupPopupInteractions error:', e);
+            }
+            try {
+                adjustWindowToFit(id);
+            } catch (e) {
+                console.warn('adjustWindowToFit error:', e);
+            }
+            if (callback) callback(win);
+        })
+        .catch(err => {
+            bodyEl.innerHTML = `
+                <div class="card" style="border-left: 3px solid #b91c1c; padding: 18px; margin: 20px 0;">
+                    <h4 style="margin: 0 0 6px; color: #b91c1c;">Failed to load window content</h4>
+                    <p class="purchase-muted" style="margin: 0;">${err.message}</p>
+                    <div style="margin-top: 14px;">
+                        <button class="button secondary" type="button" onclick="RetailFlowWindow.close('${id}')">Close</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function setupPopupInteractions(id) {
+        const win = windows[id];
+        if (!win) return;
+        const bodyEl = win.element.querySelector('.rf-window-body');
+        const form = bodyEl.querySelector('form');
+
+        if (form) {
+            markFormClean(form);
+
+            // Handle AJAX form submission inside popup
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (form.getAttribute('data-submitting') === 'true') return;
+
+                // Client-side HTML5 validation
+                if (form.checkValidity && !form.checkValidity()) {
+                    return;
+                }
+
+                // Check action button pressed
+                const submitter = e.submitter || document.activeElement;
+                const submitValue = submitter && submitter.getAttribute('name') ? submitter.value : null;
+                const submitName = submitter && submitter.getAttribute('name');
+
+                // Confirmation check for Place Order or Confirm GRN
+                if (submitter && submitter.dataset.confirm) {
+                    if (!confirm(submitter.dataset.confirm)) {
+                        return;
+                    }
+                }
+
+                form.setAttribute('data-submitting', 'true');
+                const submitButtons = form.querySelectorAll('button[type="submit"], input[type="submit"]');
+                submitButtons.forEach(btn => { btn.disabled = true; });
+
+                const formData = new FormData(form);
+                if (submitName && submitValue) {
+                    formData.set(submitName, submitValue);
+                }
+                formData.set('popup', '1');
+
+                const actionUrl = form.getAttribute('action') || win.options.url || window.location.href;
+
+                fetch(actionUrl, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-RF-Window': '1'
+                    }
+                })
+                .then(async response => {
+                    const contentType = response.headers.get('content-type') || '';
+                    if (contentType.includes('application/json')) {
+                        return { isJson: true, data: await response.json(), status: response.status };
+                    } else {
+                        return { isJson: false, html: await response.text(), status: response.status, url: response.url };
+                    }
+                })
+                .then(res => {
+                    if (res.isJson) {
+                        if (res.data.success) {
+                            form.removeAttribute('data-submitting');
+                            close(id, true);
+                            if (win.options.onSuccess) {
+                                win.options.onSuccess(res.data);
+                            }
+                            if (res.data.message) {
+                                showToast(res.data.message);
+                            }
+                            // Handle full payment or explicit redirect
+                            if (res.data.redirect_url) {
+                                if (res.data.outstanding === 0 || res.data.force_redirect) {
+                                    setTimeout(() => { window.location.href = res.data.redirect_url; }, 300);
+                                    return;
+                                }
+                            }
+                            // Refresh current page workspace
+                            refreshMainWorkspace();
+                        } else {
+                            // Validation error returned as JSON
+                            form.removeAttribute('data-submitting');
+                            submitButtons.forEach(btn => { btn.disabled = false; });
+                            alert(res.data.error || 'Please correct the errors in the form.');
+                        }
+                    } else {
+                        // Response is HTML
+                        form.removeAttribute('data-submitting');
+                        submitButtons.forEach(btn => { btn.disabled = false; });
+
+                        // Check if it's a success redirect rendered as HTML or has form errors
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(res.html, 'text/html');
+
+                        // If response has form errors, inject updated form
+                        const newForm = doc.querySelector('form');
+                        if (newForm) {
+                            const popupView = doc.querySelector('.rf-popup-view') || doc.querySelector('.rf-popup-container') || doc.querySelector('main.main') || doc.body;
+                            const styles = Array.from(doc.querySelectorAll('head style')).map(s => s.outerHTML).join('\n');
+                            bodyEl.innerHTML = (styles ? styles + '\n' : '') + (popupView ? popupView.innerHTML : res.html);
+                            setupPopupInteractions(id);
+                            adjustWindowToFit(id);
+                        } else {
+                            // Action succeeded and rendered destination view
+                            close(id, true);
+                            refreshMainWorkspace();
+                        }
+                    }
+                })
+                .catch(err => {
+                    form.removeAttribute('data-submitting');
+                    submitButtons.forEach(btn => { btn.disabled = false; });
+                    alert('An error occurred during submission: ' + err.message);
+                });
+            });
+        }
+
+        // Setup dynamic calculations and drag-to-reorder for PO lines
+        setupPurchaseOrderCalculations(bodyEl);
+    }
+
+    function setupPurchaseOrderCalculations(container) {
+        const linesContainer = container.querySelector('#purchase-lines');
+        if (!linesContainer) return;
+
+        function calculateLine(row) {
+            const qtyInput = row.querySelector('[name$="-quantity"]');
+            const costInput = row.querySelector('[name$="-unit_cost"]');
+            const discInput = row.querySelector('[name$="-discount_percent"]');
+            const taxInput = row.querySelector('[name$="-tax_percent"]');
+            const totalDisplay = row.querySelector('.rf-line-total-val');
+
+            const qty = parseFloat(qtyInput ? qtyInput.value : 0) || 0;
+            const cost = parseFloat(costInput ? costInput.value : 0) || 0;
+            const disc = parseFloat(discInput ? discInput.value : 0) || 0;
+            const tax = parseFloat(taxInput ? taxInput.value : 0) || 0;
+
+            const subtotal = qty * cost;
+            const discountAmt = (subtotal * disc) / 100;
+            const taxable = subtotal - discountAmt;
+            const taxAmt = (taxable * tax) / 100;
+            const total = taxable + taxAmt;
+
+            if (totalDisplay) {
+                totalDisplay.textContent = total.toFixed(2);
+            }
+            return { subtotal, discountAmt, taxAmt, total };
+        }
+
+        function recalculateAll() {
+            let orderSubtotal = 0;
+            let orderDiscount = 0;
+            let orderTax = 0;
+            let orderTotal = 0;
+
+            const rows = linesContainer.querySelectorAll('.purchase-line');
+            rows.forEach(row => {
+                const delCheckbox = row.querySelector('[name$="-DELETE"]');
+                if (delCheckbox && delCheckbox.checked) return;
+                const line = calculateLine(row);
+                orderSubtotal += line.subtotal;
+                orderDiscount += line.discountAmt;
+                orderTax += line.taxAmt;
+                orderTotal += line.total;
+            });
+
+            const subtotalEl = container.querySelector('#rf-order-subtotal');
+            const discountEl = container.querySelector('#rf-order-discount');
+            const taxEl = container.querySelector('#rf-order-tax');
+            const grandTotalEl = container.querySelector('#rf-order-grand-total');
+
+            if (subtotalEl) subtotalEl.textContent = orderSubtotal.toFixed(2);
+            if (discountEl) discountEl.textContent = orderDiscount.toFixed(2);
+            if (taxEl) taxEl.textContent = orderTax.toFixed(2);
+            if (grandTotalEl) grandTotalEl.textContent = orderTotal.toFixed(2);
+        }
+
+        // Attach input listeners
+        linesContainer.addEventListener('input', function(e) {
+            if (e.target.matches('[name$="-quantity"], [name$="-unit_cost"], [name$="-discount_percent"], [name$="-tax_percent"]')) {
+                recalculateAll();
+            }
+        });
+
+        // Add line totals display to lines if not present
+        function enhanceLines() {
+            const rows = linesContainer.querySelectorAll('.purchase-line');
+            rows.forEach((row, idx) => {
+                // Ensure line total display exists
+                if (!row.querySelector('.rf-line-total-badge')) {
+                    const badge = document.createElement('div');
+                    badge.className = 'rf-line-total-badge';
+                    badge.style.cssText = 'margin-top: 10px; font-size: 13px; font-weight: 600; color: var(--ink);';
+                    badge.innerHTML = `Estimated line total: <span class="rf-line-total-val">0.00</span>`;
+                    row.appendChild(badge);
+                }
+                // Add drag handle and move up/down controls
+                const legend = row.querySelector('legend');
+                if (legend && !legend.querySelector('.rf-row-handle')) {
+                    legend.setAttribute('draggable', 'true');
+                    legend.insertAdjacentHTML('afterbegin', `
+                        <span class="rf-row-handle" title="Drag to reorder">⋮⋮</span>
+                    `);
+                    legend.insertAdjacentHTML('beforeend', `
+                        <span class="rf-row-reorder-btns" style="margin-left: 10px; font-size: 11px;">
+                            <button type="button" class="rf-move-up" title="Move line up" style="cursor:pointer;padding:1px 5px;">▲</button>
+                            <button type="button" class="rf-move-down" title="Move line down" style="cursor:pointer;padding:1px 5px;">▼</button>
+                        </span>
+                    `);
+                }
+            });
+            recalculateAll();
+        }
+
+        enhanceLines();
+
+        // Drag and Drop reordering
+        let draggedRow = null;
+        linesContainer.addEventListener('dragstart', function(e) {
+            const row = e.target.closest('.purchase-line');
+            if (row) {
+                draggedRow = row;
+                row.classList.add('is-dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            }
+        });
+
+        linesContainer.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            const targetRow = e.target.closest('.purchase-line');
+            if (targetRow && targetRow !== draggedRow) {
+                const rect = targetRow.getBoundingClientRect();
+                const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
+                linesContainer.insertBefore(draggedRow, next ? targetRow.nextSibling : targetRow);
+            }
+        });
+
+        linesContainer.addEventListener('dragend', function() {
+            if (draggedRow) {
+                draggedRow.classList.remove('is-dragging');
+                draggedRow = null;
+                reindexFormset();
+            }
+        });
+
+        // Up/Down button clicks
+        linesContainer.addEventListener('click', function(e) {
+            const btn = e.target;
+            const row = btn.closest('.purchase-line');
+            if (!row) return;
+
+            if (btn.classList.contains('rf-move-up')) {
+                const prev = row.previousElementSibling;
+                if (prev && prev.classList.contains('purchase-line')) {
+                    linesContainer.insertBefore(row, prev);
+                    reindexFormset();
+                }
+            } else if (btn.classList.contains('rf-move-down')) {
+                const next = row.nextElementSibling;
+                if (next && next.classList.contains('purchase-line')) {
+                    linesContainer.insertBefore(next, row);
+                    reindexFormset();
+                }
+            }
+        });
+
+        function reindexFormset() {
+            const rows = linesContainer.querySelectorAll('.purchase-line');
+            rows.forEach((row, index) => {
+                const legend = row.querySelector('legend');
+                if (legend) {
+                    const handle = legend.querySelector('.rf-row-handle');
+                    const reorderBtns = legend.querySelector('.rf-row-reorder-btns');
+                    legend.textContent = `Item ${index + 1} `;
+                    if (handle) legend.prepend(handle);
+                    if (reorderBtns) legend.appendChild(reorderBtns);
+                }
+                row.querySelectorAll('input, select, textarea, label').forEach(el => {
+                    ['name', 'id', 'for'].forEach(attr => {
+                        const val = el.getAttribute(attr);
+                        if (val) {
+                            el.setAttribute(attr, val.replace(/items-\d+-/, `items-${index}-`));
+                        }
+                    });
+                });
+            });
+            recalculateAll();
+        }
+
+        // Add row hook
+        const addBtn = container.querySelector('#add-line');
+        if (addBtn && !addBtn.dataset.enhanced) {
+            addBtn.dataset.enhanced = 'true';
+            addBtn.addEventListener('click', function() {
+                setTimeout(enhanceLines, 50);
+            });
+        }
+    }
+
+    function refreshMainWorkspace(targetUrl) {
+        if (targetUrl) {
+            try {
+                const currentPath = window.location.pathname;
+                const targetPath = new URL(targetUrl, window.location.origin).pathname;
+                if (targetPath !== currentPath) {
+                    window.location.href = targetUrl;
+                    return;
+                }
+            } catch (e) {}
+        }
+
+        const currentUrl = window.location.href;
+        fetch(currentUrl, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(res => res.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            const mainSelectors = [
+                '.table-card',
+                '.product-page',
+                '.branch-page',
+                '.employee-table',
+                '.inventory-table',
+                '.purchase-table',
+                '.supplier-table',
+                '.supplier-details',
+                '.purchase-heading',
+                'main.main .content',
+                '.content'
+            ];
+
+            let updated = false;
+            for (const sel of mainSelectors) {
+                const newEl = doc.querySelector(sel);
+                const curEl = document.querySelector(sel);
+                if (newEl && curEl && curEl.parentNode) {
+                    curEl.parentNode.innerHTML = newEl.parentNode.innerHTML;
+                    updated = true;
+                    break;
+                }
+            }
+
+            if (!updated) {
+                window.location.reload();
+            }
+        })
+        .catch(() => {
+            window.location.reload();
+        });
+    }
+
+    function toggleMaximize(id) {
+        const win = windows[id];
+        if (!win) return;
+        const maxBtn = win.element.querySelector('.rf-win-max');
+        const iconMax = maxBtn.querySelector('.icon-max');
+        const iconRestore = maxBtn.querySelector('.icon-restore');
+
+        if (win.isMaximized) {
+            // Restore
+            win.isMaximized = false;
+            win.element.classList.remove('is-maximized');
+            if (win.prevGeometry) {
+                win.element.style.left = win.prevGeometry.left;
+                win.element.style.top = win.prevGeometry.top;
+                win.element.style.width = win.prevGeometry.width;
+                win.element.style.height = win.prevGeometry.height;
+            }
+            if (iconMax) iconMax.style.display = 'block';
+            if (iconRestore) iconRestore.style.display = 'none';
+        } else {
+            // Maximize
+            win.isMaximized = true;
+            win.prevGeometry = {
+                left: win.element.style.left,
+                top: win.element.style.top,
+                width: win.element.style.width,
+                height: win.element.style.height
+            };
+            win.element.classList.add('is-maximized');
+            if (iconMax) iconMax.style.display = 'none';
+            if (iconRestore) iconRestore.style.display = 'block';
+        }
+    }
+
+    function close(id, bypassCheck = false) {
+        const win = windows[id];
+        if (!win) return;
+
+        const form = win.element.querySelector('form');
+        if (!bypassCheck && form && form.getAttribute('data-submitting') === 'true') {
+            // Do not close during active submission
+            return;
+        }
+
+        if (!bypassCheck && formIsDirty(form)) {
+            if (!confirm('You have unsaved changes. Are you sure you want to close this window?')) {
+                return;
+            }
+        }
+
+        win.element.remove();
+        if (win.options.onClose) {
+            win.options.onClose();
+        }
+        delete windows[id];
+    }
+
+    function closeCurrent() {
+        const openWindows = Object.values(windows).filter(w => !w.isMinimized);
+        if (openWindows.length > 0) {
+            openWindows.sort((a, b) => parseInt(b.element.style.zIndex || 0) - parseInt(a.element.style.zIndex || 0));
+            close(openWindows[0].id);
+        }
+    }
+
+    // Keyboard support: Escape closes top-most window
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeCurrent();
+        }
+    });
+
+    // Auto-bind click triggers for any element with data-rf-popup
+    document.addEventListener('click', function(e) {
+        const trigger = e.target.closest('[data-rf-popup]');
+        if (!trigger) return;
+
+        e.preventDefault();
+        const url = trigger.getAttribute('data-rf-popup') || trigger.getAttribute('href');
+        const title = trigger.getAttribute('data-rf-title') || trigger.textContent.trim() || 'RetailFlow';
+        const width = parseInt(trigger.getAttribute('data-rf-width') || 920);
+        const height = parseInt(trigger.getAttribute('data-rf-height') || 520);
+        const id = trigger.getAttribute('data-rf-id') || 'win-' + url.replace(/[^a-zA-Z0-9]/g, '-');
+
+        open({
+            id,
+            title,
+            url,
+            width,
+            height
+        });
+    });
+
+    return {
+        open,
+        close,
+        closeCurrent,
+        toggleMaximize,
+        setTitle,
+        setContent,
+        showToast,
+        refreshMainWorkspace,
+        adjustToFit: adjustWindowToFit,
+        adjustWindowToFit: adjustWindowToFit
+    };
+})();
+
+// Global alias for compatibility across all template scripts and popup callbacks
+window.adjustWindowToFit = function(id) {
+    if (window.RetailFlowWindow && window.RetailFlowWindow.adjustToFit) {
+        window.RetailFlowWindow.adjustToFit(id);
+    }
+};
+</script>

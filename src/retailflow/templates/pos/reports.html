@@ -1,0 +1,180 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}POS Sales Reports | RetailFlow{% endblock %}
+{% block active_nav %}pos_reports{% endblock %}
+
+{% block extra_head %}
+<style>
+    .pos-reports-page {
+        width: 100%;
+    }
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+    }
+    .page-header h1 {
+        margin: 0 0 4px;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+    .stat-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+    .stat-card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+    }
+    .stat-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: var(--muted);
+        letter-spacing: 0.05em;
+        margin-bottom: 8px;
+    }
+    .stat-val {
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--ink);
+    }
+    .section-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr;
+        gap: 20px;
+    }
+    .panel-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 18px;
+    }
+    .panel-card h3 {
+        margin: 0 0 14px;
+        font-size: 16px;
+        font-weight: 700;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+    th, td {
+        padding: 10px 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--line);
+    }
+    th {
+        background: var(--cream);
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    .num { text-align: right; }
+    @media (max-width: 800px) {
+        .section-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pos-reports-page">
+    <div class="page-header">
+        <div>
+            <h1>POS Sales Report</h1>
+            <p style="margin:0;color:var(--muted);font-size:13px;">Daily performance for {{ today|date:"l, F d, Y" }}</p>
+        </div>
+        <div style="display:flex;gap:10px;">
+            <a href="{% url 'pos_sales_history' %}" class="button secondary">Sales History</a>
+            <a href="{% url 'pos' %}" class="button">← Back to POS Terminal</a>
+        </div>
+    </div>
+
+    <div class="stat-cards-grid">
+        <div class="stat-card">
+            <div class="stat-label">Total Revenue Today</div>
+            <div class="stat-val">₹{{ today_total }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Bills Completed</div>
+            <div class="stat-val">{{ today_count }}</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Avg Order Value</div>
+            <div class="stat-val">
+                {% if today_count > 0 %}
+                    ₹{{ today_total|floatformat:"2" }}
+                {% else %}
+                    ₹0.00
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="section-grid">
+        <!-- Payment Breakdown -->
+        <div class="panel-card">
+            <h3>Payment Breakdown (Today)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Method</th>
+                        <th class="num">Transactions</th>
+                        <th class="num">Collected</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in payments_today %}
+                    <tr>
+                        <td><strong>{{ p.payment_method }}</strong></td>
+                        <td class="num">{{ p.count }}</td>
+                        <td class="num">₹{{ p.total }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" style="text-align:center;padding:20px;color:var(--muted);">No payments recorded today.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Top Selling Items -->
+        <div class="panel-card">
+            <h3>Top Selling Products Today</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>SKU</th>
+                        <th class="num">Qty Sold</th>
+                        <th class="num">Revenue</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in top_items %}
+                    <tr>
+                        <td><strong>{{ item.product_name }}</strong></td>
+                        <td>{{ item.product_sku }}</td>
+                        <td class="num">{{ item.total_qty }}</td>
+                        <td class="num">₹{{ item.total_revenue }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" style="text-align:center;padding:20px;color:var(--muted);">No products sold yet today.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

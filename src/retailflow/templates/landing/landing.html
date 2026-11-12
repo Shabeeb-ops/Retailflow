@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetailFlow</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --ink: #0d0d0d;
+            --muted: #6d6b63;
+            --line: #dedbd0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #ffffff;
+            color: var(--ink);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .stage {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 24px;
+        }
+
+        /* ===== LOGO ===== */
+
+        .logo-wrap {
+            position: relative;
+            width: 96px;
+            height: 128px;
+        }
+
+        .logo-mark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 96px;
+            height: 96px;
+            border-radius: 24px;
+            background: var(--ink);
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            /* 1) drop + bounce, then 2) endless gentle float */
+            animation:
+                drop 1.5s cubic-bezier(0.33, 0, 0.67, 1) both,
+                float 3.2s ease-in-out 1.5s infinite;
+        }
+
+        .logo-mark svg {
+            width: 50px;
+            height: 50px;
+            fill: none;
+            stroke: #fff;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            /* the cart drives out to the right and back in from the left */
+            animation: drive 4.5s ease-in-out 2.2s infinite;
+        }
+
+        .shadow {
+            position: absolute;
+            left: 50%;
+            bottom: 8px;
+            width: 70px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.14);
+            filter: blur(4px);
+            transform: translateX(-50%);
+            animation:
+                shadow 1.5s ease-out both,
+                shadow-idle 3.2s ease-in-out 1.5s infinite;
+        }
+
+        @keyframes drop {
+            0%   { transform: translateY(-70vh) rotate(-14deg); opacity: 0; }
+            10%  { opacity: 1; }
+            55%  { transform: translateY(0) rotate(0); animation-timing-function: ease-out; }
+            70%  { transform: translateY(-26px); animation-timing-function: ease-in; }
+            82%  { transform: translateY(0); animation-timing-function: ease-out; }
+            91%  { transform: translateY(-8px); animation-timing-function: ease-in; }
+            100% { transform: translateY(0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50%      { transform: translateY(-9px); }
+        }
+
+        @keyframes drive {
+            0%, 25%   { transform: translateX(0); }
+            50%       { transform: translateX(78px); }
+            50.01%    { transform: translateX(-78px); }
+            75%, 100% { transform: translateX(0); }
+        }
+
+        @keyframes shadow {
+            0%, 40% { opacity: 0; transform: translateX(-50%) scale(0.2); }
+            55%     { opacity: 1; transform: translateX(-50%) scale(1); }
+            70%     { opacity: 0.6; transform: translateX(-50%) scale(0.75); }
+            82%     { opacity: 1; transform: translateX(-50%) scale(1); }
+            91%     { opacity: 0.8; transform: translateX(-50%) scale(0.88); }
+            100%    { opacity: 1; transform: translateX(-50%) scale(1); }
+        }
+
+        @keyframes shadow-idle {
+            0%, 100% { opacity: 1; transform: translateX(-50%) scale(1); }
+            50%      { opacity: 0.6; transform: translateX(-50%) scale(0.78); }
+        }
+
+        /* ===== TEXT ===== */
+
+        .brand {
+            margin-top: 4px;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            animation: rise 0.7s ease-out 1.5s both;
+        }
+
+        .tagline {
+            margin-top: 8px;
+            font-size: 14px;
+            color: var(--muted);
+            animation: rise 0.7s ease-out 1.7s both;
+        }
+
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .logo-mark,
+            .logo-mark svg,
+            .shadow,
+            .brand,
+            .tagline {
+                animation: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<main class="stage">
+
+    <div class="logo-wrap">
+        <div class="logo-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+                <circle cx="9" cy="20" r="1.5"/>
+                <circle cx="18" cy="20" r="1.5"/>
+                <path d="M2 3h3l2.5 12h11L21 7H6"/>
+            </svg>
+        </div>
+        <div class="shadow"></div>
+    </div>
+
+    <h1 class="brand">RetailFlow</h1>
+    <p class="tagline">Smart retail management, all in one place.</p>
+
+
+</main>
+
+<script>
+    // Pressing the Enter key anywhere on the page opens the signup page
+    document.addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            window.location.href = "{% url 'signup' %}";
+        }
+    });
+</script>
+
+</body>
+</html>

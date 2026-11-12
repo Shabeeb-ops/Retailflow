@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products | RetailFlow</title>
+
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background: var(--cream);
+            color: var(--ink);
+        }
+        .page { max-width: 1400px; margin: 30px auto; padding: 20px; }
+        .header, .toolbar, .actions, .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .header { margin-bottom: 22px; }
+        h1 { margin: 0 0 6px; }
+        .muted { color: var(--muted); }
+        .toolbar { margin-bottom: 16px; }
+        .actions { justify-content: flex-start; margin-bottom: 16px; }
+        .btn {
+            display: inline-block;
+            border: 0;
+            border-radius: 7px;
+            padding: 10px 14px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+            background: black;
+            color: white;
+        }
+        .btn.secondary { background: var(--line); color: var(--ink); }
+        .btn.green { background: black; }
+        .btn:disabled { opacity: .6; cursor: not-allowed; }
+        input, select {
+            min-width: 110px;
+            max-width: 100%;
+            padding: 9px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: white;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,.05);
+            overflow: hidden;
+        }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 1100px; }
+        th, td {
+            padding: 11px;
+            border-bottom: 1px solid var(--line);
+            text-align: left;
+            font-size: 13px;
+        }
+        th { background: var(--cream); color: var(--muted); }
+        td input, td select { width: 100%; min-width: 95px; }
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        .active { background: var(--cream); color: var(--ink); }
+        .inactive { background: var(--cream); color: var(--ink); }
+        .empty { padding: 40px; text-align: center; color: var(--muted); }
+        .pagination { padding: 16px; }
+        .message { margin-bottom: 12px; padding: 12px; border-radius: 7px; background: var(--cream); }
+        .row-error { color: var(--ink); margin-top: 5px; font-size: 12px; }
+        #save-message { margin: 10px 0; }
+        @media (max-width: 650px) {
+            .page { margin: 10px auto; padding: 12px; }
+            .header { align-items: flex-start; }
+            .toolbar form { display: flex; flex-wrap: wrap; gap: 8px; }
+        }
+
+    .stock-badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.in-stock {
+    color: var(--ink);
+    background: var(--cream);
+}
+
+.low-stock {
+    color: var(--ink);
+    background: var(--cream);
+}
+
+.out-of-stock {
+    color: var(--ink);
+    background: var(--cream);
+}
+
+
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --ink: #0d0d0d;
+        --ink-2: #1c1c1c;
+        --bg: #ffffff;
+        --cream: #f4f3ee;
+        --card: #ffffff;
+        --line: #dedbd0;
+        --muted: #6d6b63;
+        --muted-dark: #8a8a85;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body, input, select, textarea, button {
+        font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    }
+    body { background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; }
+    h1, h2, h3 { color: var(--ink); font-weight: 700; }
+    h1, .header h1, .page-header h1 { font-size: clamp(24px, 3vw, 30px); letter-spacing: -.02em; line-height: 1.2; }
+    h2 { font-size: 20px; letter-spacing: -.02em; }
+    h3 { font-size: 15px; }
+    p { line-height: 1.6; }
+    a { color: var(--ink); }
+    .muted, .subtitle, .employee, .employee-info, .header p, .empty, .back-link { color: var(--muted); }
+    .logo { font-size: 15px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .card, .stat-card, .panel, .table-container, .inventory-section, .products, .cart,
+    .welcome, .login-container, .theme-create-employee .container, .theme-import-preview .container {
+        background: var(--card); border: 1px solid var(--line); border-radius: 12px; box-shadow: none;
+    }
+    .stat-label, .card-title {
+        color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    }
+    .stat-value, .card-value { color: var(--ink); font-size: 28px; font-weight: 700; letter-spacing: -.02em; }
+    label { color: var(--ink); font-size: 12px; font-weight: 600; }
+    input, select, textarea, .field input, .field select {
+        background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 8px;
+        font-size: 13px; accent-color: var(--ink);
+    }
+    input::placeholder, textarea::placeholder { color: var(--muted); }
+    input:focus, select:focus, textarea:focus, .field input:focus, .field select:focus {
+        border-color: var(--ink); outline: 2px solid var(--line); outline-offset: 2px; box-shadow: none;
+    }
+    button, .button, .btn, .btn.green, .btn-save, .btn-primary, .payment-btn, .add-button,
+    .navbar .logout {
+        background: var(--ink); color: var(--bg); border: 1px solid var(--ink); border-radius: 8px;
+        font-size: 12px; font-weight: 600; text-decoration: none; cursor: pointer;
+    }
+    button:hover, .button:hover, .btn:hover, .btn-save:hover, .btn-primary:hover,
+    .payment-btn:hover, .add-button:hover, .navbar .logout:hover { background: var(--ink-2); color: var(--bg); }
+    .btn.secondary, .btn-cancel { background: var(--bg); color: var(--ink); border: 1px solid var(--line); }
+    .btn.secondary:hover, .btn-cancel:hover { background: var(--cream); color: var(--ink); }
+    button:disabled, .btn[aria-disabled="true"] { opacity: .5; cursor: not-allowed; }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+    input[type="file"]::file-selector-button {
+        font: inherit; background: var(--cream); color: var(--ink); border: 1px solid var(--line);
+        border-radius: 6px; padding: 6px 10px; margin-right: 8px; cursor: pointer;
+    }
+    table { border-collapse: collapse; }
+    thead, th { background: var(--cream); }
+    th { color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+    td { color: var(--ink); font-size: 13px; }
+    th, td, .panel-header, .cart-item, .navbar { border-color: var(--line); }
+    tbody tr:hover, tbody tr:hover td, .product:hover { background: var(--cream); }
+    .table-container, .table-wrap, .table-wrapper { overflow-x: auto; }
+    .role, .status, .badge, .stock-badge {
+        display: inline-block; border: 1px solid var(--line); border-radius: 999px;
+        font-size: 10px; font-weight: 600; letter-spacing: .04em;
+        background: var(--cream); color: var(--ink);
+    }
+    .status.online, .status.active, .status.normal, .badge.in-stock, .stock-badge.in-stock {
+        background: var(--cream); color: var(--ink);
+    }
+    .status.offline, .status.inactive { background: var(--bg); color: var(--muted); }
+    .status.low, .badge.low-stock, .stock-badge.low-stock { background: var(--bg); color: var(--ink); border-color: var(--ink); }
+    .status.out, .badge.out-of-stock, .stock-badge.out-of-stock { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+    .message, .alert.success { background: var(--cream); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; }
+    .error, .error-text, .row-error, .errorlist { color: var(--ink); font-weight: 600; }
+    .alert.error { background: var(--cream); color: var(--ink); border: 1px solid var(--ink); border-left-width: 4px; }
+    .errorlist { padding-left: 20px; font-size: 12px; }
+    .price, .employee-id, .product-name { color: var(--ink); }
+    .sidebar { background: var(--bg); color: var(--ink); border-right: 1px solid var(--line); flex-shrink: 0; }
+    .menu a { color: var(--muted); font-size: 13px; font-weight: 500; }
+    .menu a:hover { background: var(--cream); color: var(--ink); }
+    .menu a.active { background: var(--ink); color: var(--bg); font-weight: 600; }
+    .theme-manager-dashboard { margin: 0; padding: 32px; }
+    .theme-manager-dashboard main { max-width: 1100px; margin: auto; }
+    .theme-manager-dashboard .sidebar-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 24px; }
+    .theme-manager-dashboard .menu-item { display: flex; gap: 12px; align-items: center; padding: 20px; border: 1px solid var(--line); border-radius: 12px; text-decoration: none; font-size: 13px; font-weight: 500; }
+    .theme-manager-dashboard .menu-item:hover { background: var(--cream); }
+    .theme-manager-dashboard .icon { filter: grayscale(1); }
+    .theme-create-employee, .theme-login { padding: 24px; }
+    .theme-create-employee .container, .login-container { max-width: 100%; }
+    .main { min-width: 0; }
+    @media (max-width: 700px) {
+        .theme-employee-list, .theme-import-preview { padding: 18px 12px; }
+        .theme-create-employee, .theme-login { padding: 18px 12px; }
+        .theme-create-employee .container, .login-container { padding: 24px; }
+        .header, .page-header { flex-wrap: wrap; gap: 16px; }
+        .theme-manager-dashboard { padding: 20px 16px; }
+        .theme-manager-dashboard .sidebar-menu { grid-template-columns: 1fr; }
+        .theme-pos .layout, .theme-inventory .layout { flex-direction: column; }
+        .theme-pos .sidebar, .theme-inventory .sidebar { width: 100%; border-right: 0; border-bottom: 1px solid var(--line); }
+        .theme-pos .menu, .theme-inventory .menu { flex-direction: row; flex-wrap: wrap; }
+        .theme-pos .sidebar .logo, .theme-inventory .sidebar .logo { margin-bottom: 14px; }
+        .theme-pos .main, .theme-inventory .main { padding: 18px 12px; }
+        .theme-pos .pos-layout { grid-template-columns: 1fr; }
+        .theme-inventory .inventory-section { overflow-x: auto; }
+        .theme-dashboard .navbar { padding: 18px 16px; }
+        .theme-dashboard .container { padding: 20px 16px; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+</style>
+
+</head>
+
+<body class="theme-product-list">
+<div class="page">
+
+    <div class="header">
+        <div>
+            <h1>Products</h1>
+            <p class="muted">Manage your company's product catalog.</p>
+        </div>
+        <a class="btn secondary" href="/products/add-category/">
+            + Add Category
+        </a>
+    </div>
+
+    
+
+    
+
+        <div class="toolbar">
+            <form method="get" action="/products/">
+                <input type="search" name="q"
+                       value=""
+                       placeholder="Search name or SKU">
+
+                <select name="category">
+                    <option value="">All categories</option>
+                    
+                </select>
+
+                <select name="status">
+                    <option value="">All statuses</option>
+                    <option value="active"
+                        >
+                        Active
+                    </option>
+                    <option value="inactive"
+                        >
+                        Inactive
+                    </option>
+                </select>
+
+                <button class="btn" type="submit">Search / Filter</button>
+                <a class="btn secondary" href="/products/">Reset</a>
+            </form>
+        </div>
+
+
+<div class="actions">
+    <button class="btn" type="button" id="add-row">
+        + Add Product Row
+    </button>
+
+    <button class="btn green" type="button" id="save-rows">
+        Save New Products
+    </button>
+
+    <a class="btn secondary" href="/products/import/">
+        Import Excel / CSV
+    </a>
+</div>
+
+
+        <p id="save-message" class="muted" role="status"></p>
+
+        <div class="card">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Product Name</th>
+                        <th>SKU</th>
+                        <th>Category</th>
+                        <th>Brand</th>
+                        <th>Purchase Price</th>
+                        <th>Selling Price</th>
+                        <th>Unit</th>
+                        <th>Available Stock</th>
+                        <th>Low Stock Threshold</th>
+                        <th>Status</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="product-table">
+                    
+                        <tr id="empty-row">
+                            <td colspan="11" class="empty">
+                                No products found. Add a row or import a file.
+                            </td>
+                        </tr>
+                    
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <span class="muted">
+                    
+                        No saved products
+                    
+                </span>
+
+                <div>
+                    
+
+                    <span> Page  of  </span>
+
+                    
+                </div>
+            </div>
+        </div>
+
+        <!-- Django provides a CSRF token for the inline-save request. -->
+        <form id="csrf-form" hidden>
+            
+        </form>
+
+        <script>
+            const table = document.getElementById("product-table");
+            const addButton = document.getElementById("add-row");
+            const saveButton = document.getElementById("save-rows");
+            const message = document.getElementById("save-message");
+
+            const categories = [
+                
+            ];
+
+            function makeInput(name, type = "text", value = "") {
+                const input = document.createElement("input");
+                input.name = name;
+                input.type = type;
+                input.value = value;
+                return input;
+            }
+
+            function addCell(row, element) {
+                const cell = document.createElement("td");
+                cell.appendChild(element);
+                row.appendChild(cell);
+                return cell;
+            }
+
+            function addProductRow() {
+                document.getElementById("empty-row")?.remove();
+
+                const row = document.createElement("tr");
+                row.className = "new-product-row";
+
+                const number = document.createElement("td");
+                number.textContent = "New";
+                row.appendChild(number);
+
+                addCell(row, makeInput("name"));
+                addCell(row, makeInput("sku"));
+
+                const categorySelect = document.createElement("select");
+                categorySelect.name = "category";
+                categorySelect.required = true;
+
+                const placeholder = document.createElement("option");
+                placeholder.value = "";
+                placeholder.textContent = "Choose category";
+                categorySelect.appendChild(placeholder);
+
+                categories.forEach(category => {
+                    const option = document.createElement("option");
+                    option.value = category.id;
+                    option.textContent = category.name;
+                    categorySelect.appendChild(option);
+                });
+
+                addCell(row, categorySelect);
+                addCell(row, makeInput("brand"));
+                addCell(row, makeInput("purchase_price", "number"));
+                addCell(row, makeInput("selling_price", "number"));
+                addCell(row, makeInput("unit", "text", "Piece"));
+                addCell(row, makeInput("low_stock_threshold", "number", "10"));
+
+                const statusSelect = document.createElement("select");
+                statusSelect.name = "is_active";
+
+                [["true", "Active"], ["false", "Inactive"]].forEach(item => {
+                    const option = document.createElement("option");
+                    option.value = item[0];
+                    option.textContent = item[1];
+                    statusSelect.appendChild(option);
+                });
+
+                addCell(row, statusSelect);
+
+                const removeCell = document.createElement("td");
+                const removeButton = document.createElement("button");
+                removeButton.type = "button";
+                removeButton.className = "btn secondary";
+                removeButton.textContent = "Remove";
+                removeButton.addEventListener("click", () => row.remove());
+                removeCell.appendChild(removeButton);
+                row.appendChild(removeCell);
+
+                table.appendChild(row);
+                row.querySelector('input[name="name"]').focus();
+            }
+
+            addButton.addEventListener("click", addProductRow);
+
+            saveButton.addEventListener("click", async () => {
+                const rows = Array.from(
+                    table.querySelectorAll(".new-product-row")
+                );
+
+                if (!rows.length) {
+                    message.textContent = "Add at least one new product row.";
+                    return;
+                }
+
+                const products = rows.map(row => {
+                    const data = {};
+                    row.querySelectorAll("input, select").forEach(field => {
+                        data[field.name] = field.value;
+                    });
+                    return data;
+                });
+
+                saveButton.disabled = true;
+                message.textContent = "Saving products...";
+
+                try {
+                    const csrfToken = document.querySelector(
+                        "#csrf-form [name=csrfmiddlewaretoken]"
+                    ).value;
+
+                    const response = await fetch("/products/inline-save/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": csrfToken
+                        },
+                        body: JSON.stringify({ products })
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok || !result.success) {
+                        const details = (result.errors || []).map(item => {
+                            const fields = Object.entries(item.errors)
+                                .map(([field, errors]) => {
+                                    const messages = errors.map(error =>
+                                        typeof error === "string"
+                                            ? error
+                                            : error.message
+                                    ).join(", ");
+                                    return `${field}: ${messages}`;
+                                }).join(" | ");
+
+                            return `Row ${item.row}: ${fields}`;
+                        });
+
+                        message.textContent = [
+                            result.message || "Please correct the rows.",
+                            ...details
+                        ].join(" ");
+                        return;
+                    }
+
+                    message.textContent = result.message;
+                    window.location.reload();
+                } catch (error) {
+                    message.textContent =
+                        "Could not connect to the server. Check your connection and try again.";
+                } finally {
+                    saveButton.disabled = false;
+                }
+            });
+        </script>
+    
+</div>
+</body>
+</html>

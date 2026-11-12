@@ -1,0 +1,193 @@
+{% extends "suppliers/base.html" %}
+{% block title %}{{ title }} | RetailFlow{% endblock %}
+{% block content %}
+<div class="supplier-form">
+    {% if not is_popup %}
+    <a class="supplier-back" href="{% if relationship %}{% url 'supplier_product_list' %}{% else %}{% url 'supplier_list' %}{% endif %}">&larr; Back to {% if relationship %}supplier products{% else %}suppliers{% endif %}</a>
+    {% endif %}
+    
+    <div class="supplier-header" style="margin-bottom: 8px;">
+        <h1 style="font-size: 16px; margin: 0;">{{ title }}</h1>
+    </div>
+
+    <form method="post" class="card" style="padding: 12px 16px; margin-bottom: 0;">
+        {% csrf_token %}
+        {% if form.errors %}
+            <p role="alert" class="errorlist" style="margin: 0 0 8px 0; padding: 4px 10px; font-size: 11px;">Please correct the errors below.</p>
+        {% endif %}
+        {{ form.non_field_errors }}
+
+        {% if not relationship %}
+        <!-- Compact 6-row Layout for Add/Edit Supplier -->
+        <div class="rf-compact-form">
+            <!-- Row 1: Code, Name, Contact Person -->
+            <div class="rf-grid-3">
+                <div class="rf-field">
+                    <label for="{{ form.supplier_code.id_for_label }}">Supplier Code *</label>
+                    {{ form.supplier_code }}
+                    {% for error in form.supplier_code.errors %}<span class="rf-error-text">{{ error }}</span>{% endfor %}
+                </div>
+                <div class="rf-field">
+                    <label for="{{ form.name.id_for_label }}">Supplier Name *</label>
+                    {{ form.name }}
+                    {% for error in form.name.errors %}<span class="rf-error-text">{{ error }}</span>{% endfor %}
+                </div>
+                <div class="rf-field">
+                    <label for="{{ form.contact_person.id_for_label }}">Contact Person</label>
+                    {{ form.contact_person }}
+                    {% for error in form.contact_person.errors %}<span class="rf-error-text">{{ error }}</span>{% endfor %}
+                </div>
+            </div>
+
+            <!-- Row 2: Phone, Alternate Phone, Email -->
+            <div class="rf-grid-3">
+                <div class="rf-field">
+                    <label for="{{ form.phone.id_for_label }}">Phone Number *</label>
+                    {{ form.phone }}
+                    {% for error in form.phone.errors %}<span class="rf-error-text">{{ error }}</span>{% endfor %}
+                </div>
+                <div class="rf-field">
+                    <label for="{{ form.alternate_phone.id_for_label }}">Alternate Phone</label>
+                    {{ form.alternate_phone }}
+                    {% for error in form.alternate_phone.errors %}<span class="rf-error-text">{{ error }}</span>{% endfor %}
+                </div>
+                <div class="rf-field">
+                    <label for="{{ form.email.id_for_label }}">Email Address</label>
+                    {{ form.email }}
+                    {% for error in form.email.errors %}<span class="rf-error-text">{{ error }}</span>{% endfor %}
+                </div>
+            </div>
+
+            <!-- Row 3: Address, City, State -->
+            <div class="rf-grid-4">
+                <div class="rf-field rf-col-span-2">
+                    <label for="{{ form.address.id_for_label }}">Address</label>
+                    {{ form.address }}
+                    {% for error in form.address.errors %}<span class="rf-error-text">{{ error }}</span>{% endfor %}
+                </div>
+                <div class="rf-field">
+                    <label for="{{ form.city.id_for_label }}">City</label>
+                    {{ form.city }}
+                    {% for error in form.city.errors %}<span class="rf-error-text">{{ error }}</span>{% endfor %}
+                </div>
+                <div class="rf-field">
+                    <label for="{{ form.state.id_for_label }}">State</label>
+                    {{ form.state }}
+                    {% for error in form.state.errors %}<span class="rf-error-text">{{ error }}</span>{% endfor %}
+                </div>
+            </div>
+
+            <!-- Row 4: Postal Code, GSTIN, Payment Terms -->
+            <div class="rf-grid-3">
+                <div class="rf-field">
+                    <label for="{{ form.postal_code.id_for_label }}">Postal Code</label>
+                    {{ form.postal_code }}
+                    {% for error in form.postal_code.errors %}<span class="rf-error-text">{{ error }}</span>{% endfor %}
+                </div>
+                <div class="rf-field">
+                    <label for="{{ form.gstin.id_for_label }}">GSTIN</label>
+                    {{ form.gstin }}
+                    {% for error in form.gstin.errors %}<span class="rf-error-text">{{ error }}</span>{% endfor %}
+                </div>
+                <div class="rf-field">
+                    <label for="{{ form.payment_terms_days.id_for_label }}">Payment Terms (Days)</label>
+                    {{ form.payment_terms_days }}
+                    {% for error in form.payment_terms_days.errors %}<span class="rf-error-text">{{ error }}</span>{% endfor %}
+                </div>
+            </div>
+
+            <!-- Row 5: WhatsApp Number, WhatsApp Consent, Auto Stock Alerts -->
+            <div class="rf-grid-3" style="align-items: flex-end;">
+                <div class="rf-field">
+                    <label for="{{ form.whatsapp_number.id_for_label }}">WhatsApp Number</label>
+                    {{ form.whatsapp_number }}
+                    {% for error in form.whatsapp_number.errors %}<span class="rf-error-text">{{ error }}</span>{% endfor %}
+                </div>
+                <div class="rf-checkbox-field">
+                    {{ form.whatsapp_opt_in }}
+                    <label for="{{ form.whatsapp_opt_in.id_for_label }}">WhatsApp opt-in consent</label>
+                </div>
+                <div class="rf-checkbox-field">
+                    {{ form.auto_stock_alerts_enabled }}
+                    <label for="{{ form.auto_stock_alerts_enabled.id_for_label }}">Automatic stock alerts</label>
+                </div>
+            </div>
+
+            <!-- Row 6: Notes, Status -->
+            <div class="rf-grid-3" style="align-items: flex-end;">
+                <div class="rf-field rf-col-span-2">
+                    <label for="{{ form.notes.id_for_label }}">Internal Notes</label>
+                    {{ form.notes }}
+                    {% for error in form.notes.errors %}<span class="rf-error-text">{{ error }}</span>{% endfor %}
+                </div>
+                <div class="rf-checkbox-field">
+                    {{ form.is_active }}
+                    <label for="{{ form.is_active.id_for_label }}">Active supplier</label>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <!-- Compact Layout for Supplier Product Assignment -->
+        <div class="rf-compact-form">
+            <div style="margin-bottom: 8px;">
+                <label for="rf-prod-filter" style="display:block;font-size:12px;font-weight:600;margin-bottom:3px;">Quick product search</label>
+                <input type="text" id="rf-prod-filter" placeholder="Filter product by name or SKU..." style="width:100%;height:32px;padding:4px 10px;border:1px solid var(--line);border-radius:6px;box-sizing:border-box;font-size:13px;">
+            </div>
+            <div class="rf-grid-2">
+                <div class="rf-field">
+                    <label for="{{ form.supplier.id_for_label }}">Supplier *</label>
+                    {{ form.supplier }}
+                    {% for error in form.supplier.errors %}<span class="rf-error-text">{{ error }}</span>{% endfor %}
+                </div>
+                <div class="rf-field">
+                    <label for="{{ form.product.id_for_label }}">Product *</label>
+                    {{ form.product }}
+                    {% for error in form.product.errors %}<span class="rf-error-text">{{ error }}</span>{% endfor %}
+                </div>
+            </div>
+            <div class="rf-grid-2" style="margin-top: 4px;">
+                <div class="rf-checkbox-field">
+                    {{ form.is_preferred }}
+                    <label for="{{ form.is_preferred.id_for_label }}">Preferred supplier for this product</label>
+                </div>
+                <div class="rf-checkbox-field">
+                    {{ form.is_active }}
+                    <label for="{{ form.is_active.id_for_label }}">Active relationship</label>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="rf-form-actions">
+            <a class="button secondary" href="{% if relationship %}{% url 'supplier_product_list' %}{% else %}{% url 'supplier_list' %}{% endif %}" onclick="if(window.RetailFlowWindow){const win=this.closest('.rf-window');if(win){RetailFlowWindow.close(win.id);return false;}}">
+                Cancel
+            </a>
+            <button type="submit" class="button">
+                {% if relationship %}Save Relationship{% else %}Save Supplier{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+(function() {
+    const filterInput = document.getElementById('rf-prod-filter');
+    const productSelect = document.getElementById('id_product');
+    if (filterInput && productSelect) {
+        const originalOptions = Array.from(productSelect.options);
+        filterInput.addEventListener('input', function() {
+            const q = this.value.trim().toLowerCase();
+            const currentVal = productSelect.value;
+            productSelect.innerHTML = '';
+            originalOptions.forEach(opt => {
+                if (!opt.value || opt.text.toLowerCase().includes(q)) {
+                    productSelect.appendChild(opt.cloneNode(true));
+                }
+            });
+            productSelect.value = currentVal;
+        });
+    }
+})();
+</script>
+{% endblock %}

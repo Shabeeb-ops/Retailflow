@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Employee Dashboard</title>
+
+    <style>
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+            background: var(--cream);
+            margin: 0;
+        }
+
+        .navbar {
+            background: white;
+
+            padding: 20px 40px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            border-bottom: 1px solid var(--line);
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .logout {
+            text-decoration: none;
+
+            color: white;
+
+            background: var(--ink);
+
+            padding: 10px 18px;
+
+            border-radius: 8px;
+        }
+
+        .container {
+            padding: 40px;
+        }
+
+        .welcome {
+            background: white;
+
+            padding: 30px;
+
+            border-radius: 15px;
+
+            max-width: 600px;
+        }
+
+        .status {
+            margin-top: 20px;
+
+            display: inline-block;
+
+            padding: 8px 14px;
+
+            border-radius: 20px;
+
+            background: var(--cream);
+
+            color: var(--ink);
+
+            font-weight: 600;
+        }
+
+    </style>
+
+    {% include "shared/dashboard_theme.html" %}
+</head>
+
+
+<body class="theme-dashboard">
+
+
+<div class="navbar">
+
+    <div class="logo">
+        RetailFlow
+    </div>
+
+    <a href="{% url 'employee_logout' %}"
+       class="logout">
+
+        Logout
+
+    </a>
+
+</div>
+
+
+<div class="container">
+
+    <div class="welcome">
+
+        <h1>
+            Welcome, {{ employee.first_name }}
+        </h1>
+
+        <p>
+            Employee ID:
+            <strong>{{ employee.employee_id }}</strong>
+        </p>
+
+        <p>
+            Role:
+            <strong>{{ employee.get_role_display }}</strong>
+        </p>
+
+
+        <div class="status">
+
+            🟢 Active
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</body>
+
+</html>

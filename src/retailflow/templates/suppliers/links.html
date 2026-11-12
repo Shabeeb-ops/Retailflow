@@ -1,0 +1,21 @@
+<div class="card supplier-table"><table>
+    <thead><tr><th>Supplier</th><th>Product</th><th>SKU</th><th>Preferred</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>{% for link in links %}<tr>
+        <td><a href="{% url 'supplier_detail' link.supplier_id %}" data-rf-popup="{% url 'supplier_detail' link.supplier_id %}" data-rf-title="{{ link.supplier.name }}">{{ link.supplier.name }}</a></td>
+        <td>{{ link.product.name }}</td>
+        <td>{{ link.product.sku }}</td>
+        <td>{{ link.is_preferred|yesno:'Yes,No' }}</td>
+        <td><span class="status {{ link.is_active|yesno:'active,inactive' }}">{{ link.is_active|yesno:'Active,Inactive' }}</span></td>
+        <td>
+            <div class="supplier-actions">
+                <a href="{% url 'edit_supplier_product' link.pk %}" data-rf-popup="{% url 'edit_supplier_product' link.pk %}" data-rf-title="Edit Product Assignment" data-rf-width="640" data-rf-height="480">Edit</a>
+                {% if link.is_active %}
+                <form method="post" action="{% url 'deactivate_supplier_product' link.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="button secondary" data-confirm="Deactivate this supplier product relationship?">Deactivate</button>
+                </form>
+                {% endif %}
+            </div>
+        </td>
+    </tr>{% empty %}<tr><td colspan="6">No product assignments yet.</td></tr>{% endfor %}</tbody>
+</table></div>

@@ -1,0 +1,2368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RetailFlow POS — {{ company.company_name|default:"Point of Sale" }}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* RetailFlow signature ink & neutral theme (preserved 100%) */
+            --ink: #0d0d0d;
+            --ink-2: #1f2937;
+            --canvas: #f4f4f0;
+            --panel: #ffffff;
+            --card: #ffffff;
+            --line: #e6e4dc;
+            --line-light: #f0eee6;
+            --muted: #6b6a65;
+            --muted-light: #9ca3af;
+            --primary: #0d0d0d;
+            --primary-hover: #262626;
+            --primary-light: #f4f3ee;
+            --success: #10b981;
+            --success-light: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-light: #fffbeb;
+            --danger: #ef4444;
+            --danger-light: #fef2f2;
+            --radius-xl: 18px;
+            --radius-lg: 14px;
+            --radius-md: 10px;
+            --radius-sm: 8px;
+            --radius-pill: 9999px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 14px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--canvas);
+            color: var(--ink);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* 3-COLUMN APP SHELL */
+        .pos-app-shell {
+            display: grid;
+            grid-template-columns: 210px 1fr 390px;
+            height: 100vh;
+            gap: 12px;
+            padding: 12px;
+            overflow: hidden;
+        }
+
+        /* ========================================================
+           1. LEFT NAVIGATION RAIL (Sidebar)
+           ======================================================== */
+        .pos-rail {
+            background: var(--panel);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--line);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 18px 14px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .rail-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px 6px 16px;
+            border-bottom: 1px solid var(--line-light);
+        }
+
+        .brand-logo-mark {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--ink);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .brand-text-col {
+            min-width: 0;
+        }
+
+        .brand-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--ink);
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        .brand-store {
+            font-size: 11px;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+        }
+
+        .rail-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 16px;
+            flex: 1;
+        }
+
+        .rail-nav-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted-light);
+            padding: 8px 10px 4px;
+        }
+
+        .rail-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--muted);
+            text-decoration: none;
+            transition: all 0.15s ease;
+            cursor: pointer;
+            border: 0;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+        }
+
+        .rail-item .nav-icon {
+            font-size: 16px;
+            line-height: 1;
+            width: 20px;
+            display: grid;
+            place-items: center;
+        }
+
+        .rail-item:hover {
+            background: var(--primary-light);
+            color: var(--ink);
+        }
+
+        .rail-item.active {
+            background: var(--ink);
+            color: #ffffff;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+        }
+
+        .rail-item.active .counter-pill {
+            background: rgba(255, 255, 255, 0.25);
+            color: #fff;
+        }
+
+        .counter-pill {
+            margin-left: auto;
+            background: var(--primary-light);
+            color: var(--ink);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: var(--radius-pill);
+            border: 1px solid var(--line);
+        }
+
+        .rail-bottom {
+            padding-top: 14px;
+            border-top: 1px solid var(--line-light);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .cashier-profile-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            background: var(--primary-light);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-md);
+        }
+
+        .cashier-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-pill);
+            background: var(--ink);
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-size: 12px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .cashier-meta {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .cashier-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .cashier-role-pill {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .rail-logout-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 12px;
+            border-radius: var(--radius-md);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--danger);
+            text-decoration: none;
+            background: var(--danger-light);
+            border: 1px solid #fecaca;
+            justify-content: center;
+            transition: background 0.15s ease;
+        }
+
+        .rail-logout-btn:hover {
+            background: #fee2e2;
+        }
+
+        /* ========================================================
+           2. CENTER WORKSPACE (Catalog & Products)
+           ======================================================== */
+        .pos-center {
+            background: var(--panel);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--line);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Top Search & Filter Bar */
+        .catalog-topbar {
+            padding: 14px 18px 12px;
+            border-bottom: 1px solid var(--line-light);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #ffffff;
+        }
+
+        .search-pill-wrapper {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-pill-wrapper .search-icon {
+            position: absolute;
+            left: 14px;
+            color: var(--muted);
+            font-size: 15px;
+            pointer-events: none;
+        }
+
+        .search-pill-input {
+            width: 100%;
+            height: 42px;
+            padding: 8px 16px 8px 40px;
+            border-radius: var(--radius-pill);
+            border: 1px solid var(--line);
+            background: var(--primary-light);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--ink);
+            outline: none;
+            transition: all 0.15s ease;
+        }
+
+        .search-pill-input:focus {
+            background: #ffffff;
+            border-color: var(--ink);
+            box-shadow: 0 0 0 3px rgba(13, 13, 13, 0.08);
+        }
+
+        .search-pill-input::placeholder {
+            color: #94938f;
+        }
+
+        .scanner-pill-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: var(--radius-pill);
+            background: var(--success-light);
+            border: 1px solid #bbf7d0;
+            color: #15803d;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .scanner-pulse-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #22c55e;
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.6; }
+        }
+
+        /* Horizontal Category Cards Row */
+        .category-row-container {
+            padding: 10px 18px 12px;
+            border-bottom: 1px solid var(--line-light);
+            background: #fafaf8;
+        }
+
+        .category-cards-carousel {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding-bottom: 2px;
+        }
+
+        .category-cards-carousel::-webkit-scrollbar {
+            display: none;
+        }
+
+        .cat-card-chip {
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-lg);
+            padding: 10px 14px;
+            min-width: 105px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            transition: all 0.15s ease;
+            user-select: none;
+            text-align: left;
+            flex-shrink: 0;
+        }
+
+        .cat-card-chip:hover {
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
+
+        .cat-card-chip.active {
+            border-color: var(--ink);
+            background: var(--ink);
+            color: #ffffff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .cat-card-chip .cat-icon {
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .cat-card-chip .cat-name {
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        .cat-card-chip .cat-count {
+            font-size: 10px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        .cat-card-chip.active .cat-count {
+            color: #d1d5db;
+        }
+
+        /* Products Grid (Scrollable) */
+        .products-grid-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 18px;
+            min-height: 0;
+            background: #ffffff;
+        }
+
+        .product-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 14px;
+            align-content: start;
+        }
+
+        /* Individual Product Card (matching reference style) */
+        .dish-card {
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-lg);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+            user-select: none;
+        }
+
+        .dish-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .dish-card.out-of-stock {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .dish-media {
+            height: 110px;
+            border-radius: 10px;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .dish-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .dish-media-fallback {
+            font-size: 38px;
+            line-height: 1;
+        }
+
+        .dish-stock-pill {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: var(--radius-pill);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(2px);
+            border: 1px solid var(--line);
+            color: #15803d;
+        }
+
+        .dish-stock-pill.low {
+            color: #b45309;
+            background: #fffbeb;
+            border-color: #fde68a;
+        }
+
+        .dish-stock-pill.out {
+            color: #b91c1c;
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+
+        .dish-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+
+        .dish-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ink);
+            line-height: 1.3;
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            height: 34px;
+        }
+
+        .dish-meta-sub {
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .dish-price {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--ink);
+            margin-top: auto;
+        }
+
+        /* Card Action Button / Interactive Stepper */
+        .dish-action-box {
+            margin-top: auto;
+            width: 100%;
+        }
+
+        .btn-add-dish {
+            width: 100%;
+            padding: 8px 12px;
+            background: var(--primary-light);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-pill);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--ink);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-align: center;
+        }
+
+        .btn-add-dish:hover {
+            background: var(--ink);
+            color: #ffffff;
+            border-color: var(--ink);
+        }
+
+        /* Stepper right on the card (matching card 2 in reference!) */
+        .card-stepper-pill {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--ink);
+            color: #ffffff;
+            border-radius: var(--radius-pill);
+            padding: 2px 4px;
+            height: 34px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .card-stepper-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-pill);
+            border: 0;
+            background: rgba(255, 255, 255, 0.18);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: background 0.1s ease;
+        }
+
+        .card-stepper-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .card-stepper-val {
+            font-size: 13px;
+            font-weight: 800;
+            min-width: 26px;
+            text-align: center;
+        }
+
+        /* Bottom Held Bills Bar (matching reference T1, T2 chips!) */
+        .center-bottom-bar {
+            padding: 10px 18px;
+            border-top: 1px solid var(--line-light);
+            background: #fafaf8;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .held-chips-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            flex: 1;
+        }
+
+        .held-chips-row::-webkit-scrollbar { display: none; }
+
+        .quick-held-chip {
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-pill);
+            padding: 6px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+        }
+
+        .quick-held-chip:hover {
+            border-color: var(--ink);
+            background: var(--primary-light);
+        }
+
+        .quick-held-chip .chip-tag {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--warning-light);
+            color: #b45309;
+            font-weight: 800;
+            display: grid;
+            place-items: center;
+            font-size: 10px;
+        }
+
+        .quick-held-chip .chip-name {
+            font-weight: 700;
+            color: var(--ink);
+        }
+
+        .quick-held-chip .chip-detail {
+            color: var(--muted);
+        }
+
+        .btn-hold-quick {
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-pill);
+            padding: 7px 14px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--ink);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+        }
+
+        .btn-hold-quick:hover {
+            background: var(--primary-light);
+            border-color: var(--ink);
+        }
+
+        /* ========================================================
+           3. RIGHT ORDER PANEL (Shopping Cart & Direct Checkout)
+           ======================================================== */
+        .pos-right {
+            background: var(--panel);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--line);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .cart-header-row {
+            padding: 16px 18px 12px;
+            border-bottom: 1px solid var(--line-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .cart-title-meta h3 {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--ink);
+            letter-spacing: -0.02em;
+        }
+
+        .cart-customer-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-clear-cart {
+            background: transparent;
+            border: 0;
+            color: var(--danger);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            transition: background 0.15s ease;
+        }
+
+        .btn-clear-cart:hover {
+            background: var(--danger-light);
+        }
+
+        /* Order Mode Pills (matching Dine in / Take Away / Delivery in reference!) */
+        .order-mode-bar {
+            padding: 8px 18px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            background: #fafaf8;
+            border-bottom: 1px solid var(--line-light);
+        }
+
+        .order-mode-pill {
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-pill);
+            padding: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .order-mode-pill.active {
+            background: var(--ink);
+            color: #ffffff;
+            border-color: var(--ink);
+        }
+
+        /* Cart Items List */
+        .cart-items-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 18px;
+            min-height: 0;
+        }
+
+        .cart-empty-box {
+            text-align: center;
+            padding: 50px 20px;
+            color: var(--muted);
+        }
+
+        .cart-empty-icon {
+            font-size: 42px;
+            margin-bottom: 10px;
+            opacity: 0.6;
+        }
+
+        .cart-dish-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--line-light);
+        }
+
+        .cart-dish-thumb {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            background: var(--primary-light);
+            display: grid;
+            place-items: center;
+            font-size: 18px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .cart-dish-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .cart-dish-main {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .cart-dish-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--ink);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.3;
+        }
+
+        .cart-dish-rate {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .cart-dish-stepper {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--primary-light);
+            border-radius: var(--radius-sm);
+            padding: 2px 4px;
+        }
+
+        .stepper-btn {
+            width: 22px;
+            height: 22px;
+            border: 0;
+            background: #ffffff;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ink);
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+        }
+
+        .stepper-btn:hover { background: #f3f4f6; }
+
+        .stepper-count {
+            font-size: 11px;
+            font-weight: 700;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .cart-dish-right {
+            text-align: right;
+            min-width: 60px;
+        }
+
+        .cart-dish-total {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--ink);
+        }
+
+        .cart-dish-remove {
+            background: transparent;
+            border: 0;
+            color: var(--muted-light);
+            font-size: 11px;
+            cursor: pointer;
+            margin-top: 2px;
+            transition: color 0.15s ease;
+        }
+
+        .cart-dish-remove:hover { color: var(--danger); }
+
+        /* Cart Footer Summary */
+        .cart-summary-card {
+            padding: 14px 18px 16px;
+            background: #fafaf8;
+            border-top: 1px solid var(--line-light);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .calc-breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .calc-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .calc-row.discount-row {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        .calc-row.grand-row {
+            padding-top: 8px;
+            margin-top: 4px;
+            border-top: 1px dashed var(--line);
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--ink);
+        }
+
+        .calc-row.grand-row .grand-num {
+            font-size: 19px;
+            font-weight: 900;
+            color: var(--ink);
+        }
+
+        /* Direct Payment Method Selector Cards (matching reference above button!) */
+        .direct-payment-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .direct-pay-chip {
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-md);
+            padding: 10px 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+        }
+
+        .direct-pay-chip:hover {
+            border-color: #cbd5e1;
+        }
+
+        .direct-pay-chip.active {
+            border-color: var(--ink);
+            background: var(--ink);
+            color: #ffffff;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .direct-pay-chip .pay-icon {
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .direct-pay-chip .pay-label {
+            font-size: 10px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* Big Place Order Button (matching reference) */
+        .btn-place-order {
+            width: 100%;
+            background: var(--ink);
+            color: #ffffff;
+            border: 0;
+            border-radius: var(--radius-pill);
+            padding: 14px 20px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(13, 13, 13, 0.2);
+        }
+
+        .btn-place-order:hover:not(:disabled) {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-place-order:disabled {
+            background: #d1d5db;
+            color: #9ca3af;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* ========================================================
+           4. MODALS (Checkout Tender, Receipt, Held Bills)
+           ======================================================== */
+        .pos-modal-backdrop {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(13, 13, 13, 0.45);
+            backdrop-filter: blur(3px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .pos-modal {
+            background: #ffffff;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--line);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: modalPop 0.15s ease-out;
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.96); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--line-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--ink);
+        }
+
+        .modal-close-btn {
+            background: transparent;
+            border: 0;
+            font-size: 22px;
+            line-height: 1;
+            cursor: pointer;
+            color: var(--muted);
+            padding: 2px 6px;
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 14px 20px;
+            border-top: 1px solid var(--line-light);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            background: #fafaf8;
+        }
+
+        .form-group-pos {
+            margin-bottom: 14px;
+        }
+
+        .form-group-pos label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 6px;
+        }
+
+        .form-group-pos input {
+            width: 100%;
+            height: 40px;
+            padding: 8px 12px;
+            border: 1px solid var(--line);
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--ink);
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+
+        .form-group-pos input:focus {
+            border-color: var(--ink);
+        }
+
+        .quick-cash-row {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .quick-cash-btn {
+            background: var(--primary-light);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-sm);
+            padding: 6px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--ink);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .quick-cash-btn:hover {
+            background: #e5e7eb;
+        }
+
+        .change-due-box {
+            background: var(--success-light);
+            border: 1px solid #bbf7d0;
+            color: #15803d;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            text-align: center;
+            font-size: 15px;
+            font-weight: 800;
+            margin-top: 12px;
+        }
+
+        /* Toast notification */
+        .pos-toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--ink);
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: var(--radius-pill);
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+            z-index: 2000;
+            display: none;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1100px) {
+            .pos-app-shell {
+                grid-template-columns: 70px 1fr 340px;
+            }
+            .rail-brand .brand-text-col,
+            .rail-item span,
+            .rail-item .counter-pill,
+            .rail-nav-label,
+            .cashier-profile-card .cashier-meta {
+                display: none;
+            }
+            .rail-item {
+                justify-content: center;
+                padding: 12px;
+            }
+            .cashier-profile-card {
+                justify-content: center;
+                padding: 6px;
+            }
+            .rail-logout-btn span { display: none; }
+        }
+
+        @media (max-width: 820px) {
+            .pos-app-shell {
+                grid-template-columns: 1fr;
+                height: auto;
+                overflow-y: auto;
+            }
+            body { overflow: auto; height: auto; }
+            .pos-rail { display: none; }
+            .pos-center, .pos-right { height: auto; min-height: 500px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="pos-app-shell">
+
+    <!-- ========================================================
+         COLUMN 1: LEFT NAVIGATION RAIL (Sidebar)
+         ======================================================== -->
+    <aside class="pos-rail">
+        <div>
+            <div class="rail-brand">
+                <div class="brand-logo-mark">🛒</div>
+                <div class="brand-text-col">
+                    <div class="brand-title">RetailFlow POS</div>
+                    <div class="brand-store" title="{{ company.company_name|default:'RetailFlow Store' }}">
+                        {{ company.company_name|default:"RetailFlow Store" }}
+                    </div>
+                </div>
+            </div>
+
+            <nav class="rail-nav">
+                <div class="rail-nav-label">POS Menu</div>
+
+                <button type="button" class="rail-item active" id="rail-btn-terminal" title="POS Terminal">
+                    <span class="nav-icon">📋</span>
+                    <span>Terminal</span>
+                </button>
+
+                <a href="{% url 'pos_sales_history' %}" class="rail-item" title="View Sales History">
+                    <span class="nav-icon">📜</span>
+                    <span>Sales History</span>
+                </a>
+
+                <a href="{% url 'pos_reports' %}" class="rail-item" title="View Sales Reports">
+                    <span class="nav-icon">📊</span>
+                    <span>Reports</span>
+                </a>
+
+                <button type="button" class="rail-item" id="btn-held-carts" title="Held Bills">
+                    <span class="nav-icon">📦</span>
+                    <span>Held Bills</span>
+                    <span class="counter-pill" id="held-count-badge">{{ held_carts_count|default:"0" }}</span>
+                </button>
+
+                {% if not request.user.employee or request.user.employee.role != 'CASHIER' %}
+                <a href="{% url 'pos_settings' %}" class="rail-item" title="POS Settings">
+                    <span class="nav-icon">⚙️</span>
+                    <span>Settings</span>
+                </a>
+                {% endif %}
+            </nav>
+        </div>
+
+        <div class="rail-bottom">
+            <div class="cashier-profile-card">
+                <div class="cashier-avatar">
+                    {% if employee.first_name %}{{ employee.first_name|first|upper }}{% elif employee.user.email %}{{ employee.user.email|first|upper }}{% else %}C{% endif %}
+                </div>
+                <div class="cashier-meta">
+                    <div class="cashier-name" title="{% if employee.first_name %}{{ employee.first_name }} {{ employee.last_name }}{% else %}Cashier{% endif %}">
+                        {% if employee.first_name %}{{ employee.first_name }} {{ employee.last_name }}{% else %}Cashier{% endif %}
+                    </div>
+                    <span class="cashier-role-pill">{% if employee.get_role_display %}{{ employee.get_role_display }}{% else %}Cashier{% endif %}</span>
+                </div>
+            </div>
+
+            <a href="{% url 'employee_logout' %}" class="rail-logout-btn" title="Log out">
+                <span>🚪</span>
+                <span>Log out</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ========================================================
+         COLUMN 2: CENTER WORKSPACE (Catalog & Products)
+         ======================================================== -->
+    <main class="pos-center">
+        <!-- Top Search Bar -->
+        <header class="catalog-topbar">
+            <div class="search-pill-wrapper">
+                <span class="search-icon">🔍</span>
+                <input
+                    type="search"
+                    id="product-search"
+                    class="search-pill-input"
+                    placeholder="Search product name, SKU, or scan barcode (Enter)..."
+                    autocomplete="off"
+                    autofocus
+                >
+            </div>
+            <div class="scanner-pill-indicator" title="Barcode scanner active and ready">
+                <span class="scanner-pulse-dot"></span>
+                <span>Scanner Active</span>
+            </div>
+        </header>
+
+        <!-- Horizontal Category Cards Row (matching reference) -->
+        <section class="category-row-container">
+            <div class="category-cards-carousel" id="category-pills">
+                <!-- All Categories -->
+                <div class="cat-card-chip active" data-category="ALL">
+                    <span class="cat-icon">🔲</span>
+                    <span class="cat-name">All Items</span>
+                    <span class="cat-count">{{ total_products_count|default:products|length }} Items</span>
+                </div>
+
+                {% for cat in categories %}
+                <div class="cat-card-chip" data-category="{{ cat.pk }}">
+                    <span class="cat-icon">🏷️</span>
+                    <span class="cat-name">{{ cat.name }}</span>
+                    <span class="cat-count">{{ cat.product_count|default:"0" }} Items</span>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Products Grid (matching reference 3-col card style) -->
+        <section class="products-grid-scroll">
+            <div class="product-cards-grid" id="product-grid">
+                {% for product in products %}
+                <div class="dish-card {% if product.available_stock <= 0 %}out-of-stock{% endif %}"
+                     data-id="{{ product.pk }}"
+                     data-name="{{ product.name }}"
+                     data-sku="{{ product.sku }}"
+                     data-barcode="{{ product.barcode|default:'' }}"
+                     data-category="{{ product.category_id }}"
+                     data-price="{{ product.selling_price }}"
+                     data-stock="{{ product.available_stock }}">
+
+                    <div class="dish-media">
+                        {% if settings.enable_images and product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+                        {% else %}
+                            <span class="dish-media-fallback">📦</span>
+                        {% endif %}
+
+                        {% if settings.show_stock %}
+                            {% if product.available_stock <= 0 %}
+                                <span class="dish-stock-pill out">Out of stock</span>
+                            {% elif product.available_stock <= product.low_stock_threshold %}
+                                <span class="dish-stock-pill low">{{ product.available_stock }} left</span>
+                            {% else %}
+                                <span class="dish-stock-pill">{{ product.available_stock }} in stock</span>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+
+                    <div class="dish-info">
+                        <h4 class="dish-title" title="{{ product.name }}">{{ product.name }}</h4>
+                        <div class="dish-meta-sub">SKU: {{ product.sku }}</div>
+                        <div class="dish-price">₹{{ product.selling_price }}</div>
+                    </div>
+
+                    <div class="dish-action-box" data-card-action-id="{{ product.pk }}">
+                        <button type="button" class="btn-add-dish" data-action="add-card" data-id="{{ product.pk }}">
+                            Add to Bill
+                        </button>
+                    </div>
+                </div>
+                {% empty %}
+                <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--muted);">
+                    <p style="font-size: 16px; font-weight: 700; margin: 0 0 6px;">No products found</p>
+                    <p style="font-size: 13px; margin: 0;">Add products in Product Management to begin billing.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Bottom Held Bills Bar (matching reference T1, T2 chips!) -->
+        <footer class="center-bottom-bar">
+            <div class="held-chips-row" id="quick-held-strip">
+                {% for held in recent_held_carts %}
+                <div class="quick-held-chip" data-held-id="{{ held.pk }}" title="Click to recall this held bill">
+                    <span class="chip-tag">H{{ forloop.counter }}</span>
+                    <span class="chip-name">{{ held.hold_reference|truncatechars:14 }}</span>
+                    <span class="chip-detail">Recall</span>
+                </div>
+                {% empty %}
+                <span style="font-size: 11px; color: var(--muted);">No active paused bills</span>
+                {% endfor %}
+            </div>
+
+            <button type="button" class="btn-hold-quick" id="btn-hold-bill" title="Pause and hold the current shopping cart">
+                <span>⏸️</span>
+                <span>Hold Bill</span>
+            </button>
+        </footer>
+    </main>
+
+    <!-- ========================================================
+         COLUMN 3: RIGHT ORDER PANEL (Shopping Cart & Direct Checkout)
+         ======================================================== -->
+    <aside class="pos-right">
+        <!-- Order Header -->
+        <div class="cart-header-row">
+            <div class="cart-title-meta">
+                <h3>Current Bill</h3>
+                <div class="cart-customer-sub">
+                    <span id="label-cust-name">Walk-in Customer</span>
+                    <button type="button" id="btn-edit-cust" style="background:transparent;border:0;color:var(--muted);cursor:pointer;font-size:12px;" title="Edit Customer Details">✏️</button>
+                </div>
+            </div>
+            <button type="button" class="btn-clear-cart" id="btn-clear-cart" title="Clear all items from bill">
+                Clear All
+            </button>
+        </div>
+
+        <!-- Order Mode Toggle Pills (matching Dine in / Take Away / Delivery in reference!) -->
+        <div class="order-mode-bar">
+            <div class="order-mode-pill active" data-mode="WALKIN">Standard</div>
+            <div class="order-mode-pill" data-mode="TAKEAWAY">Takeaway</div>
+            <div class="order-mode-pill" data-mode="EXPRESS">Express</div>
+        </div>
+
+        <!-- Scrollable Cart Items List -->
+        <div class="cart-items-container" id="cart-list">
+            <div class="cart-empty-box">
+                <div class="cart-empty-icon">🛒</div>
+                <p style="font-weight: 700; margin: 0 0 4px; font-size: 14px;">Cart is currently empty</p>
+                <p style="font-size: 12px; margin: 0; color: var(--muted);">Click any product card or scan a barcode to add items.</p>
+            </div>
+        </div>
+
+        <!-- Cart Summary & Direct Payment Section -->
+        <div class="cart-summary-card">
+            <div class="calc-breakdown">
+                <div class="calc-row">
+                    <span>Sub Total (<span id="cart-total-qty">0</span> items)</span>
+                    <span id="cart-subtotal-display">₹0.00</span>
+                </div>
+                <div class="calc-row discount-row" id="discount-summary-row" style="display:none;">
+                    <span>Discount</span>
+                    <span id="cart-discount-display">-₹0.00</span>
+                </div>
+                <div class="calc-row grand-row">
+                    <span>Total Amount</span>
+                    <span class="grand-num" id="cart-grand-display">₹0.00</span>
+                </div>
+            </div>
+
+            <!-- Direct Payment Method Selector (matching reference cards directly above button!) -->
+            <div class="direct-payment-grid">
+                {% if settings.enable_cash %}
+                <div class="direct-pay-chip active" data-method="CASH">
+                    <span class="pay-icon">💵</span>
+                    <span class="pay-label">Cash</span>
+                </div>
+                {% endif %}
+                {% if settings.enable_card %}
+                <div class="direct-pay-chip" data-method="CARD">
+                    <span class="pay-icon">💳</span>
+                    <span class="pay-label">Card</span>
+                </div>
+                {% endif %}
+                {% if settings.enable_upi %}
+                <div class="direct-pay-chip" data-method="UPI">
+                    <span class="pay-icon">📱</span>
+                    <span class="pay-label">UPI / QR</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Place Order Primary Action Button -->
+            <button type="button" class="btn-place-order" id="btn-open-checkout" disabled>
+                <span>Place Order (₹0.00)</span>
+            </button>
+        </div>
+    </aside>
+
+</div>
+
+<!-- ========================================================
+     MODALS (Tender Confirmation, Held Carts, Thermal Receipt)
+     ======================================================== -->
+
+<!-- CHECKOUT / TENDER MODAL -->
+<div class="pos-modal-backdrop" id="checkout-modal">
+    <div class="pos-modal">
+        <div class="modal-header">
+            <h3>Complete Checkout</h3>
+            <button type="button" class="modal-close-btn" id="btn-close-checkout">&times;</button>
+        </div>
+        <div class="modal-body">
+            <!-- Payment Method Tabs inside modal -->
+            <label style="font-size:12px;font-weight:700;margin-bottom:6px;display:block;">Payment Method</label>
+            <div class="direct-payment-grid" style="margin-bottom:14px;">
+                {% if settings.enable_cash %}
+                <div class="direct-pay-chip active" id="modal-pay-cash" data-method="CASH">
+                    <span class="pay-icon">💵</span>
+                    <span class="pay-label">Cash</span>
+                </div>
+                {% endif %}
+                {% if settings.enable_card %}
+                <div class="direct-pay-chip" id="modal-pay-card" data-method="CARD">
+                    <span class="pay-icon">💳</span>
+                    <span class="pay-label">Card</span>
+                </div>
+                {% endif %}
+                {% if settings.enable_upi %}
+                <div class="direct-pay-chip" id="modal-pay-upi" data-method="UPI">
+                    <span class="pay-icon">📱</span>
+                    <span class="pay-label">UPI / QR</span>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Customer Details (Optional) -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+                <div class="form-group-pos">
+                    <label for="cust-name">Customer Name</label>
+                    <input type="text" id="cust-name" placeholder="Walk-in Customer">
+                </div>
+                <div class="form-group-pos">
+                    <label for="cust-phone">Mobile / Phone</label>
+                    <input type="tel" id="cust-phone" placeholder="e.g. 9876543210">
+                </div>
+            </div>
+
+            <!-- Discount Field (if enabled) -->
+            {% if settings.enable_discount %}
+            <div class="form-group-pos">
+                <label for="checkout-discount">Discount Amount (₹) <span style="font-weight:normal;color:var(--muted);">(Max {{ settings.max_discount_percent }}%)</span></label>
+                <input type="number" id="checkout-discount" min="0" step="0.5" value="0">
+            </div>
+            {% endif %}
+
+            <!-- Cash Tendered Details -->
+            <div id="cash-payment-details">
+                <div class="form-group-pos">
+                    <label for="tendered-amount">Cash Tendered by Customer (₹)</label>
+                    <input type="number" id="tendered-amount" min="0" step="1">
+                    <div class="quick-cash-row">
+                        <button type="button" class="quick-cash-btn" id="btn-exact-cash">Exact</button>
+                        <button type="button" class="quick-cash-btn" data-add="50">+₹50</button>
+                        <button type="button" class="quick-cash-btn" data-add="100">+₹100</button>
+                        <button type="button" class="quick-cash-btn" data-add="500">+₹500</button>
+                        <button type="button" class="quick-cash-btn" data-add="2000">+₹2000</button>
+                    </div>
+                </div>
+
+                <div class="change-due-box" id="change-due-box">
+                    Change Due: <strong id="change-due-val">₹0.00</strong>
+                </div>
+            </div>
+
+            <!-- Digital Payment Reference -->
+            <div id="digital-payment-details" style="display:none;">
+                <div class="form-group-pos">
+                    <label for="digital-ref">Transaction / Approval Reference ID</label>
+                    <input type="text" id="digital-ref" placeholder="UPI Ref / RRN / Card Auth Code">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn-add-dish" id="btn-cancel-checkout" style="width:auto;padding:8px 16px;">Cancel</button>
+            <button type="button" class="btn-place-order" id="btn-confirm-checkout" style="width:auto;padding:10px 22px;font-size:14px;">
+                Confirm & Print Bill
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- HELD CARTS MODAL -->
+<div class="pos-modal-backdrop" id="held-carts-modal">
+    <div class="pos-modal" style="max-width:560px;">
+        <div class="modal-header">
+            <h3>Paused / Held Bills</h3>
+            <button type="button" class="modal-close-btn" id="btn-close-held">&times;</button>
+        </div>
+        <div class="modal-body" id="held-carts-list" style="padding:14px;">
+            <p style="text-align:center;padding:20px;color:var(--muted);">Loading held carts...</p>
+        </div>
+    </div>
+</div>
+
+<!-- THERMAL RECEIPT MODAL -->
+<div class="pos-modal-backdrop" id="receipt-modal">
+    <div class="pos-modal" style="max-width:440px;">
+        <div class="modal-header">
+            <h3>Sale Receipt</h3>
+            <button type="button" class="modal-close-btn" id="btn-close-receipt-modal">&times;</button>
+        </div>
+        <div class="modal-body" id="receipt-modal-body" style="padding:14px;background:#f8fafc;">
+            <!-- Receipt HTML injected via AJAX -->
+        </div>
+    </div>
+</div>
+
+<div class="pos-toast" id="pos-toast"></div>
+
+<!-- ========================================================
+     JAVASCRIPT POS ENGINE (Preserving full functionality)
+     ======================================================== -->
+<script>
+window.RetailFlowPOS = (function() {
+    const CART_STORAGE_KEY = "rf_pos_cart_{{ company.pk }}_{{ employee.pk|default:request.user.pk }}";
+
+    let cart = new Map();
+    let currentDiscount = 0;
+    let selectedPaymentMethod = "CASH";
+    let activeHeldCartId = null;
+    let selectedOrderMode = "WALKIN";
+
+    const currencyFormatter = new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        minimumFractionDigits: 2
+    });
+
+    function formatCurrency(amount) {
+        return currencyFormatter.format(amount);
+    }
+
+    function showToast(message, duration = 3000) {
+        const toast = document.getElementById("pos-toast");
+        toast.textContent = message;
+        toast.style.display = "block";
+        setTimeout(() => { toast.style.display = "none"; }, duration);
+    }
+
+    // Load Cart from localStorage
+    function loadSavedCart() {
+        try {
+            const raw = localStorage.getItem(CART_STORAGE_KEY);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) {
+                    cart.clear();
+                    parsed.forEach(item => {
+                        const id = parseInt(item.id, 10) || item.id;
+                        cart.set(String(id), { ...item, id });
+                    });
+                }
+            }
+        } catch (e) {
+            console.warn("Could not parse saved cart:", e);
+        }
+        renderCart();
+    }
+
+    // Save Cart to localStorage
+    function saveCart() {
+        try {
+            const items = Array.from(cart.values());
+            localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+        } catch (e) {
+            console.warn("Could not save cart:", e);
+        }
+    }
+
+    function addToCartById(productId) {
+        const card = document.querySelector(`.dish-card[data-id="${productId}"]`);
+        if (!card) return;
+
+        const stock = parseInt(card.dataset.stock) || 0;
+        const name = card.dataset.name;
+        const sku = card.dataset.sku;
+        const price = parseFloat(card.dataset.price) || 0;
+
+        if (stock <= 0) {
+            showToast(`"${name}" is out of stock!`);
+            return;
+        }
+
+        const id = parseInt(productId, 10) || productId;
+        const idStr = String(id);
+        const existing = cart.get(idStr);
+
+        if (existing) {
+            if (existing.quantity >= stock) {
+                showToast(`Max available stock (${stock}) reached for "${name}"`);
+                return;
+            }
+            existing.quantity += 1;
+        } else {
+            cart.set(idStr, {
+                id: id,
+                name: name,
+                sku: sku,
+                price: price,
+                stock: stock,
+                quantity: 1
+            });
+        }
+
+        saveCart();
+        renderCart();
+    }
+
+    function decrementCartItem(productId) {
+        const idStr = String(productId);
+        const item = cart.get(idStr);
+        if (!item) return;
+
+        item.quantity -= 1;
+        if (item.quantity <= 0) {
+            cart.delete(idStr);
+        }
+        saveCart();
+        renderCart();
+    }
+
+    // Render cart items AND update interactive card steppers (matching card 2 in reference!)
+    function renderCart() {
+        const list = document.getElementById("cart-list");
+        list.innerHTML = "";
+
+        let subtotal = 0;
+        let totalItems = 0;
+
+        if (cart.size === 0) {
+            list.innerHTML = `
+                <div class="cart-empty-box">
+                    <div class="cart-empty-icon">🛒</div>
+                    <p style="font-weight: 700; margin: 0 0 4px; font-size: 14px;">Cart is currently empty</p>
+                    <p style="font-size: 12px; margin: 0; color: var(--muted);">Click any product card or scan a barcode to add items.</p>
+                </div>
+            `;
+            document.getElementById("btn-open-checkout").disabled = true;
+            document.getElementById("btn-open-checkout").innerHTML = `<span>Place Order (₹0.00)</span>`;
+            document.getElementById("cart-total-qty").textContent = "0";
+            document.getElementById("cart-subtotal-display").textContent = "₹0.00";
+            document.getElementById("cart-grand-display").textContent = "₹0.00";
+            document.getElementById("discount-summary-row").style.display = "none";
+        } else {
+            cart.forEach(item => {
+                const lineTotal = item.price * item.quantity;
+                subtotal += lineTotal;
+                totalItems += item.quantity;
+
+                const row = document.createElement("div");
+                row.className = "cart-dish-item";
+                row.innerHTML = `
+                    <div class="cart-dish-thumb">
+                        <span>📦</span>
+                    </div>
+                    <div class="cart-dish-main">
+                        <div class="cart-dish-title" title="${item.name}">${item.name}</div>
+                        <div class="cart-dish-rate">₹${item.price.toFixed(2)} &bull; ${item.quantity}X</div>
+                    </div>
+                    <div class="cart-dish-stepper">
+                        <button type="button" class="stepper-btn" data-action="minus" data-id="${item.id}">−</button>
+                        <span class="stepper-count">${item.quantity}</span>
+                        <button type="button" class="stepper-btn" data-action="plus" data-id="${item.id}">+</button>
+                    </div>
+                    <div class="cart-dish-right">
+                        <div class="cart-dish-total">₹${lineTotal.toFixed(2)}</div>
+                        <button type="button" class="cart-dish-remove" data-action="remove" data-id="${item.id}">Remove</button>
+                    </div>
+                `;
+                list.appendChild(row);
+            });
+
+            const grandTotal = Math.max(0, subtotal - currentDiscount);
+
+            document.getElementById("cart-total-qty").textContent = totalItems;
+            document.getElementById("cart-subtotal-display").textContent = formatCurrency(subtotal);
+
+            if (currentDiscount > 0) {
+                document.getElementById("discount-summary-row").style.display = "flex";
+                document.getElementById("cart-discount-display").textContent = `-₹${currentDiscount.toFixed(2)}`;
+            } else {
+                document.getElementById("discount-summary-row").style.display = "none";
+            }
+
+            document.getElementById("cart-grand-display").textContent = formatCurrency(grandTotal);
+            document.getElementById("btn-open-checkout").disabled = false;
+            document.getElementById("btn-open-checkout").innerHTML = `<span>Place Order (${formatCurrency(grandTotal)})</span>`;
+        }
+
+        // Update card action buttons (sync stepper pill on card)
+        document.querySelectorAll(".dish-card").forEach(card => {
+            const cardId = card.dataset.id;
+            const actionBox = card.querySelector(".dish-action-box");
+            if (!actionBox) return;
+
+            const cartItem = cart.get(String(cardId));
+            if (cartItem && cartItem.quantity > 0) {
+                actionBox.innerHTML = `
+                    <div class="card-stepper-pill">
+                        <button type="button" class="card-stepper-btn" data-action="minus" data-id="${cardId}">−</button>
+                        <span class="card-stepper-val">${cartItem.quantity}</span>
+                        <button type="button" class="card-stepper-btn" data-action="plus" data-id="${cardId}">+</button>
+                    </div>
+                `;
+            } else {
+                actionBox.innerHTML = `
+                    <button type="button" class="btn-add-dish" data-action="add-card" data-id="${cardId}">
+                        Add to Bill
+                    </button>
+                `;
+            }
+        });
+    }
+
+    function calculateCartTotals() {
+        let subtotal = 0;
+        cart.forEach(item => {
+            subtotal += item.price * item.quantity;
+        });
+        const grand = Math.max(0, subtotal - currentDiscount);
+        return { subtotal, discount: currentDiscount, grand };
+    }
+
+    function syncPaymentMethod(method) {
+        selectedPaymentMethod = method;
+        document.querySelectorAll(".direct-pay-chip").forEach(c => {
+            c.classList.toggle("active", c.dataset.method === method);
+        });
+
+        const cashDetails = document.getElementById("cash-payment-details");
+        const digiDetails = document.getElementById("digital-payment-details");
+        if (method === "CASH") {
+            cashDetails.style.display = "block";
+            digiDetails.style.display = "none";
+        } else {
+            cashDetails.style.display = "none";
+            digiDetails.style.display = "block";
+        }
+    }
+
+    function openCheckoutModal() {
+        if (cart.size === 0) return;
+        const totals = calculateCartTotals();
+
+        const discInput = document.getElementById("checkout-discount");
+        if (discInput) discInput.value = currentDiscount;
+
+        const tenderInput = document.getElementById("tendered-amount");
+        tenderInput.value = totals.grand.toFixed(2);
+        updateChangeDue();
+
+        syncPaymentMethod(selectedPaymentMethod);
+        document.getElementById("checkout-modal").style.display = "flex";
+    }
+
+    function closeCheckoutModal() {
+        document.getElementById("checkout-modal").style.display = "none";
+    }
+
+    function updateChangeDue() {
+        const totals = calculateCartTotals();
+        const tendered = parseFloat(document.getElementById("tendered-amount").value) || 0;
+        const changeDue = Math.max(0, tendered - totals.grand);
+        document.getElementById("change-due-val").textContent = formatCurrency(changeDue);
+    }
+
+    function generateUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+
+    function executeCheckout() {
+        if (cart.size === 0) return;
+
+        const totals = calculateCartTotals();
+        const tenderedVal = parseFloat(document.getElementById("tendered-amount").value) || totals.grand;
+
+        if (selectedPaymentMethod === "CASH" && tenderedVal < totals.grand) {
+            alert(`Tendered amount (₹${tenderedVal.toFixed(2)}) is less than grand total (${formatCurrency(totals.grand)}).`);
+            return;
+        }
+
+        const confirmBtn = document.getElementById("btn-confirm-checkout");
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = "Processing...";
+
+        const payload = {
+            items: Array.from(cart.values()).map(it => ({ id: parseInt(it.id, 10) || it.id, quantity: it.quantity })),
+            payment_method: selectedPaymentMethod,
+            amount_tendered: selectedPaymentMethod === "CASH" ? tenderedVal : totals.grand,
+            reference: document.getElementById("digital-ref").value.trim(),
+            discount_amount: currentDiscount,
+            customer_name: document.getElementById("cust-name").value.trim() || document.getElementById("label-cust-name").textContent.trim(),
+            customer_phone: document.getElementById("cust-phone").value.trim(),
+            idempotency_key: generateUUID(),
+            held_cart_id: activeHeldCartId
+        };
+
+        fetch("{% url 'pos_checkout' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCsrfToken()
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(data => {
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = "Confirm & Print Bill";
+
+            if (data.success) {
+                closeCheckoutModal();
+                cart.clear();
+                currentDiscount = 0;
+                activeHeldCartId = null;
+                saveCart();
+                renderCart();
+
+                openReceiptModal(data.receipt_url, data.print_url);
+            } else {
+                alert("Checkout error: " + (data.error || "Transaction could not be completed."));
+            }
+        })
+        .catch(err => {
+            confirmBtn.disabled = false;
+            confirmBtn.textContent = "Confirm & Print Bill";
+            alert("Network error during checkout: " + err.message);
+        });
+    }
+
+    function openReceiptModal(receiptUrl, printUrl) {
+        fetch(receiptUrl, {
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById("receipt-modal-body").innerHTML = `
+                ${html}
+                <div style="margin-top:16px;text-align:center;">
+                    <a href="${printUrl}" target="_blank" class="btn-place-order" style="text-decoration:none;display:inline-flex;">
+                        🖨️ Print Thermal Slip
+                    </a>
+                </div>
+            `;
+            document.getElementById("receipt-modal").style.display = "flex";
+        })
+        .catch(e => {
+            window.location.href = receiptUrl;
+        });
+    }
+
+    function closeReceiptModal() {
+        document.getElementById("receipt-modal").style.display = "none";
+    }
+
+    function holdCurrentBill() {
+        if (cart.size === 0) {
+            showToast("Cannot hold an empty cart.");
+            return;
+        }
+
+        const ref = prompt("Enter a reference or customer name for this held bill:", `Bill-${Date.now().toString().slice(-4)}`);
+        if (ref === null) return;
+
+        const cartItems = Array.from(cart.values());
+
+        fetch("{% url 'pos_hold_cart' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCsrfToken()
+            },
+            body: JSON.stringify({
+                cart_data: cartItems,
+                hold_reference: ref.trim() || `Bill-${Date.now().toString().slice(-4)}`
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                cart.clear();
+                saveCart();
+                renderCart();
+                document.getElementById("held-count-badge").textContent = data.count;
+                showToast(`Bill "${data.reference}" held successfully.`);
+                refreshHeldStrip();
+            } else {
+                alert("Could not hold bill: " + data.error);
+            }
+        });
+    }
+
+    function refreshHeldStrip() {
+        fetch("{% url 'pos_list_held_carts' %}")
+        .then(res => res.json())
+        .then(data => {
+            if (!data.success) return;
+            const strip = document.getElementById("quick-held-strip");
+            if (!strip) return;
+
+            if (data.carts.length === 0) {
+                strip.innerHTML = `<span style="font-size: 11px; color: var(--muted);">No active paused bills</span>`;
+                return;
+            }
+
+            let html = "";
+            data.carts.slice(0, 5).forEach((c, idx) => {
+                html += `
+                    <div class="quick-held-chip" data-held-id="${c.id}" title="Click to recall this held bill">
+                        <span class="chip-tag">H${idx + 1}</span>
+                        <span class="chip-name">${c.reference.slice(0, 14)}</span>
+                        <span class="chip-detail">Recall</span>
+                    </div>
+                `;
+            });
+            strip.innerHTML = html;
+        });
+    }
+
+    function recallHeldCart(heldId) {
+        if (cart.size > 0) {
+            if (!confirm("You have items in your current cart. Loading this held bill will replace your current cart. Continue?")) {
+                return;
+            }
+        }
+
+        fetch(`{% url 'pos_recall_cart' 0 %}`.replace("0", heldId), {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCsrfToken()
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                cart.clear();
+                data.cart_data.forEach(item => {
+                    const id = parseInt(item.id, 10) || item.id;
+                    cart.set(String(id), { ...item, id });
+                });
+                activeHeldCartId = heldId;
+                saveCart();
+                renderCart();
+                document.getElementById("held-count-badge").textContent = data.count;
+                document.getElementById("held-carts-modal").style.display = "none";
+                showToast(`Recalled bill "${data.reference}".`);
+                refreshHeldStrip();
+            } else {
+                alert("Could not recall bill: " + data.error);
+            }
+        });
+    }
+
+    function openHeldCartsModal() {
+        const container = document.getElementById("held-carts-list");
+        container.innerHTML = `<p style="text-align:center;padding:20px;color:var(--muted);">Loading held carts...</p>`;
+        document.getElementById("held-carts-modal").style.display = "flex";
+
+        fetch("{% url 'pos_list_held_carts' %}")
+        .then(res => res.json())
+        .then(data => {
+            if (!data.success || data.carts.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center;padding:30px;color:var(--muted);">
+                        <p style="font-size:15px;font-weight:700;margin:0 0 4px;">No held bills</p>
+                        <p style="font-size:12px;margin:0;">Active transactions paused using "Hold Bill" appear here.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = `<div style="display:flex;flex-direction:column;gap:8px;">`;
+            data.carts.forEach(c => {
+                html += `
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:#ffffff;">
+                        <div>
+                            <div style="font-weight:800;font-size:13px;color:var(--ink);">${c.reference}</div>
+                            <div style="font-size:11px;color:var(--muted);margin-top:2px;">
+                                ${c.items_count} items &bull; Est. ₹${c.total_estimate.toFixed(2)} &bull; ${c.created_at}
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button type="button" class="btn-add-dish" data-recall-id="${c.id}" style="width:auto;padding:6px 14px;">Recall</button>
+                            <button type="button" data-delete-id="${c.id}" style="background:transparent;border:0;color:var(--danger);cursor:pointer;font-size:12px;padding:6px 8px;">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+            container.innerHTML = html;
+        });
+    }
+
+    function deleteHeldCart(heldId) {
+        if (!confirm("Delete this held bill permanently?")) return;
+        fetch(`{% url 'pos_delete_held_cart' 0 %}`.replace("0", heldId), {
+            method: "POST",
+            headers: { "X-CSRFToken": getCsrfToken() }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById("held-count-badge").textContent = data.count;
+                openHeldCartsModal();
+                refreshHeldStrip();
+                showToast("Held bill deleted.");
+            }
+        });
+    }
+
+    function getCsrfToken() {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.startsWith("csrftoken=")) {
+                return decodeURIComponent(cookie.substring("csrftoken=".length));
+            }
+        }
+        return "";
+    }
+
+    // Initialize Event Listeners
+    function init() {
+        loadSavedCart();
+
+        // Product Cards Click (Delegation for Add and Stepper on card)
+        document.getElementById("product-grid").addEventListener("click", function(e) {
+            const addBtn = e.target.closest("[data-action='add-card']");
+            if (addBtn) {
+                addToCartById(addBtn.dataset.id);
+                return;
+            }
+
+            const stepperBtn = e.target.closest(".card-stepper-btn");
+            if (stepperBtn) {
+                const id = stepperBtn.dataset.id;
+                if (stepperBtn.dataset.action === "plus") {
+                    addToCartById(id);
+                } else if (stepperBtn.dataset.action === "minus") {
+                    decrementCartItem(id);
+                }
+                return;
+            }
+
+            // Clicking on the product card itself also adds to cart
+            const card = e.target.closest(".dish-card");
+            if (card && !card.classList.contains("out-of-stock") && !e.target.closest(".card-stepper-pill")) {
+                addToCartById(card.dataset.id);
+            }
+        });
+
+        // Cart Item List (plus, minus, remove)
+        document.getElementById("cart-list").addEventListener("click", function(e) {
+            const btn = e.target.closest("button");
+            if (!btn) return;
+
+            const action = btn.dataset.action;
+            const id = btn.dataset.id;
+
+            if (action === "plus") {
+                addToCartById(id);
+            } else if (action === "minus") {
+                decrementCartItem(id);
+            } else if (action === "remove") {
+                cart.delete(String(id));
+                saveCart();
+                renderCart();
+            }
+        });
+
+        // Clear Cart
+        document.getElementById("btn-clear-cart").addEventListener("click", function() {
+            if (cart.size === 0) return;
+            if (confirm("Clear all items from the current bill?")) {
+                cart.clear();
+                currentDiscount = 0;
+                activeHeldCartId = null;
+                saveCart();
+                renderCart();
+                showToast("Cart cleared.");
+            }
+        });
+
+        // Category Filter Cards
+        document.getElementById("category-pills").addEventListener("click", function(e) {
+            const chip = e.target.closest(".cat-card-chip");
+            if (!chip) return;
+
+            document.querySelectorAll(".cat-card-chip").forEach(c => c.classList.remove("active"));
+            chip.classList.add("active");
+
+            const catId = chip.dataset.category;
+            document.querySelectorAll(".dish-card").forEach(card => {
+                if (catId === "ALL" || card.dataset.category === catId) {
+                    card.style.display = "";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        });
+
+        // Search Input (Text & Barcode)
+        const searchInput = document.getElementById("product-search");
+        searchInput.addEventListener("input", function() {
+            const q = this.value.trim().toLowerCase();
+            const activeChip = document.querySelector(".cat-card-chip.active");
+            const activeCatId = activeChip ? activeChip.dataset.category : "ALL";
+
+            document.querySelectorAll(".dish-card").forEach(card => {
+                const matchesCat = activeCatId === "ALL" || card.dataset.category === activeCatId;
+                const matchesText = card.dataset.name.toLowerCase().includes(q)
+                    || card.dataset.sku.toLowerCase().includes(q)
+                    || (card.dataset.barcode && card.dataset.barcode.toLowerCase().includes(q));
+
+                card.style.display = (matchesCat && matchesText) ? "" : "none";
+            });
+        });
+
+        // Enter key in search adds barcode scan immediately
+        searchInput.addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                const code = this.value.trim();
+                if (!code) return;
+
+                let matchedCard = null;
+                document.querySelectorAll(".dish-card").forEach(card => {
+                    if (card.dataset.barcode && card.dataset.barcode.toLowerCase() === code.toLowerCase()) {
+                        matchedCard = card;
+                    } else if (card.dataset.sku && card.dataset.sku.toLowerCase() === code.toLowerCase()) {
+                        matchedCard = card;
+                    }
+                });
+
+                if (matchedCard) {
+                    addToCartById(matchedCard.dataset.id);
+                    searchInput.value = "";
+                    searchInput.dispatchEvent(new Event("input"));
+                    showToast(`Scanned: ${matchedCard.dataset.name}`);
+                } else {
+                    fetch(`{% url 'pos_barcode_search' 'PLACEHOLDER' %}`.replace("PLACEHOLDER", encodeURIComponent(code)))
+                    .then(res => res.json())
+                    .then(resData => {
+                        if (resData.found) {
+                            addToCartById(resData.product.id);
+                            searchInput.value = "";
+                            searchInput.dispatchEvent(new Event("input"));
+                            showToast(`Scanned: ${resData.product.name}`);
+                        } else {
+                            showToast(`Barcode "${code}" not found.`);
+                        }
+                    })
+                    .catch(() => {
+                        showToast(`Barcode "${code}" not found.`);
+                    });
+                }
+            }
+        });
+
+        // Order Mode Toggle Pills (Walk-in, Takeaway, Express)
+        document.querySelectorAll(".order-mode-pill").forEach(pill => {
+            pill.addEventListener("click", function() {
+                document.querySelectorAll(".order-mode-pill").forEach(p => p.classList.remove("active"));
+                this.classList.add("active");
+                selectedOrderMode = this.dataset.mode;
+            });
+        });
+
+        // Customer Edit Prompt
+        document.getElementById("btn-edit-cust").addEventListener("click", function() {
+            const current = document.getElementById("label-cust-name").textContent.trim();
+            const newName = prompt("Enter customer name:", current === "Walk-in Customer" ? "" : current);
+            if (newName !== null) {
+                const finalName = newName.trim() || "Walk-in Customer";
+                document.getElementById("label-cust-name").textContent = finalName;
+                document.getElementById("cust-name").value = finalName;
+            }
+        });
+
+        // Direct Payment Chip Click (in right panel and modal)
+        document.querySelectorAll(".direct-pay-chip").forEach(chip => {
+            chip.addEventListener("click", function() {
+                syncPaymentMethod(this.dataset.method);
+            });
+        });
+
+        // Checkout Button
+        document.getElementById("btn-open-checkout").addEventListener("click", openCheckoutModal);
+        document.getElementById("btn-close-checkout").addEventListener("click", closeCheckoutModal);
+        document.getElementById("btn-cancel-checkout").addEventListener("click", closeCheckoutModal);
+
+        // Discount input change
+        const discInput = document.getElementById("checkout-discount");
+        if (discInput) {
+            discInput.addEventListener("input", function() {
+                currentDiscount = Math.max(0, parseFloat(this.value) || 0);
+                renderCart();
+                updateChangeDue();
+            });
+        }
+
+        // Tender input change
+        document.getElementById("tendered-amount").addEventListener("input", updateChangeDue);
+
+        // Quick Cash Buttons
+        document.getElementById("btn-exact-cash").addEventListener("click", function() {
+            const totals = calculateCartTotals();
+            document.getElementById("tendered-amount").value = totals.grand.toFixed(2);
+            updateChangeDue();
+        });
+
+        document.querySelectorAll(".quick-cash-btn[data-add]").forEach(btn => {
+            btn.addEventListener("click", function() {
+                const addVal = parseFloat(this.dataset.add) || 0;
+                const current = parseFloat(document.getElementById("tendered-amount").value) || 0;
+                document.getElementById("tendered-amount").value = (current + addVal).toFixed(2);
+                updateChangeDue();
+            });
+        });
+
+        // Confirm Checkout
+        document.getElementById("btn-confirm-checkout").addEventListener("click", executeCheckout);
+
+        // Receipt modal close
+        document.getElementById("btn-close-receipt-modal").addEventListener("click", closeReceiptModal);
+
+        // Held Bill actions
+        document.getElementById("btn-hold-bill").addEventListener("click", holdCurrentBill);
+        document.getElementById("btn-held-carts").addEventListener("click", openHeldCartsModal);
+        document.getElementById("btn-close-held").addEventListener("click", function() {
+            document.getElementById("held-carts-modal").style.display = "none";
+        });
+
+        // Recall from bottom held strip
+        const quickStrip = document.getElementById("quick-held-strip");
+        if (quickStrip) {
+            quickStrip.addEventListener("click", function(e) {
+                const chip = e.target.closest(".quick-held-chip");
+                if (chip && chip.dataset.heldId) {
+                    recallHeldCart(chip.dataset.heldId);
+                }
+            });
+        }
+
+        // Modal Held Carts List delegation (recall, delete)
+        document.getElementById("held-carts-list").addEventListener("click", function(e) {
+            const recallBtn = e.target.closest("[data-recall-id]");
+            if (recallBtn) {
+                recallHeldCart(recallBtn.dataset.recallId);
+                return;
+            }
+
+            const deleteBtn = e.target.closest("[data-delete-id]");
+            if (deleteBtn) {
+                deleteHeldCart(deleteBtn.dataset.deleteId);
+                return;
+            }
+        });
+    }
+
+    return {
+        init: init
+    };
+})();
+
+document.addEventListener("DOMContentLoaded", function() {
+    window.RetailFlowPOS.init();
+});
+</script>
+</body>
+</html>

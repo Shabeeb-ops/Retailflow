@@ -1,0 +1,509 @@
+{% extends "layouts/admin_base.html" %}
+
+{% block title %}Products | RetailFlow{% endblock %}
+{% block active_nav %}products{% endblock %}
+
+{% block extra_head %}
+<style>
+    .product-page {
+        width: 100%;
+    }
+    .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 22px;
+        flex-wrap: wrap;
+    }
+    .page-header h1 {
+        margin: 0 0 6px;
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+    }
+    .muted {
+        color: var(--muted);
+        font-size: 13px;
+    }
+    .toolbar {
+        margin-bottom: 16px;
+    }
+    .toolbar form {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .toolbar input, .toolbar select {
+        padding: 9px 12px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fff;
+        font-size: 13px;
+    }
+    .actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+    }
+    .table-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .table-wrap {
+        overflow-x: auto;
+        width: 100%;
+    }
+    .product-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1100px;
+    }
+    .product-table th, .product-table td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        font-size: 13px;
+    }
+    .product-table th {
+        background: var(--cream);
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+    .product-table td input, .product-table td select {
+        width: 100%;
+        min-width: 95px;
+        padding: 7px 9px;
+        font-size: 12px;
+    }
+    .product-table tbody tr:hover td {
+        background: #faf9f5;
+    }
+    .status {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .status.active {
+        background: var(--cream);
+        color: var(--ink);
+    }
+    .status.inactive {
+        background: var(--cream);
+        color: var(--muted);
+    }
+    .stock-badge {
+        display: inline-block;
+        padding: 5px 9px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+    .stock-badge.in-stock {
+        color: var(--ink);
+        background: var(--cream);
+    }
+    .stock-badge.low-stock {
+        color: var(--ink);
+        background: var(--cream);
+        border: 1px solid var(--ink);
+    }
+    .stock-badge.out-of-stock {
+        color: #fff;
+        background: var(--ink);
+    }
+    .empty {
+        padding: 40px;
+        text-align: center;
+        color: var(--muted);
+    }
+    .pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .row-error {
+        color: var(--ink);
+        margin-top: 5px;
+        font-size: 12px;
+    }
+    #save-message {
+        margin: 10px 0;
+        font-size: 13px;
+        font-weight: 500;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="product-page">
+    <div class="page-header">
+        <div>
+            <h1>Products</h1>
+            <p class="muted">Manage your company's product catalog.</p>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <a class="button" href="{% url 'add_product' %}" data-rf-popup="{% url 'add_product' %}" data-rf-title="Add Product" data-rf-width="920" data-rf-height="370">
+                + Add Product
+            </a>
+            <a class="button secondary" href="{% url 'add_category' %}" data-rf-popup="{% url 'add_category' %}" data-rf-title="Add Category" data-rf-width="640" data-rf-height="270">
+                + Add Category
+            </a>
+        </div>
+    </div>
+
+    {% if company_missing %}
+        <div class="card empty">
+            <h3>Company setup required</h3>
+            <p>Register your company before managing products.</p>
+        </div>
+    {% else %}
+        <div class="toolbar">
+            <form method="get" action="{% url 'product_list' %}">
+                <input type="search" name="q"
+                       value="{{ search }}"
+                       placeholder="Search name or SKU">
+
+                <select name="category">
+                    <option value="">All categories</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}"
+                            {% if selected_category == category.id|stringformat:"s" %}
+                                selected
+                            {% endif %}>
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <select name="status">
+                    <option value="">All statuses</option>
+                    <option value="active" {% if selected_status == "active" %}selected{% endif %}>
+                        Active
+                    </option>
+                    <option value="inactive" {% if selected_status == "inactive" %}selected{% endif %}>
+                        Inactive
+                    </option>
+                </select>
+
+                <button class="button" type="submit">Search / Filter</button>
+                <a class="button secondary" href="{% url 'product_list' %}">Reset</a>
+            </form>
+        </div>
+
+        <div class="actions">
+            <button class="button" type="button" id="add-row">
+                + Add Product Row
+            </button>
+
+            <button class="button" type="button" id="save-rows">
+                Save New Products
+            </button>
+
+            <a class="button secondary" href="{% url 'import_products' %}">
+                Import Excel / CSV
+            </a>
+        </div>
+
+        <p id="save-message" class="muted" role="status"></p>
+
+        <div class="table-card">
+            <div class="table-wrap">
+                <table class="product-table">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Product Name</th>
+                        <th>SKU</th>
+                        <th>Category</th>
+                        <th>Brand</th>
+                        <th>Purchase Price</th>
+                        <th>Selling Price</th>
+                        <th>Unit</th>
+                        <th>Available Stock</th>
+                        <th>Low Stock Threshold</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="product-table">
+                    {% for product in products %}
+                        <tr>
+                            <td>{{ products.start_index|add:forloop.counter0 }}</td>
+                            <td><strong>{{ product.name }}</strong></td>
+                            <td>{{ product.sku }}</td>
+                            <td>{{ product.category.name }}</td>
+                            <td>{{ product.brand|default:"-" }}</td>
+                            <td>{{ product.purchase_price }}</td>
+                            <td>{{ product.selling_price }}</td>
+                            <td>{{ product.unit }}</td>
+                            <td>
+                                {% with stock=product.available_stock|default_if_none:0 %}
+                                    {% if stock == 0 %}
+                                        <span class="stock-badge out-of-stock">
+                                             Out of Stock (0)
+                                        </span>
+                                    {% elif stock <= product.low_stock_threshold %}
+                                        <span class="stock-badge low-stock">
+                                            Low Stock ({{ stock }})
+                                        </span>
+                                    {% else %}
+                                        <span class="stock-badge in-stock">
+                                            In Stock ({{ stock }})
+                                        </span>
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                            <td>{{ product.low_stock_threshold }}</td>
+                            <td>
+                                {% if product.is_active %}
+                                    <span class="status active">Active</span>
+                                {% else %}
+                                    <span class="status inactive">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'edit_product' product.pk %}"
+                                   data-rf-popup="{% url 'edit_product' product.pk %}"
+                                   data-rf-title="Edit Product &mdash; {{ product.name }}"
+                                   data-rf-width="920"
+                                   data-rf-height="370"
+                                   class="button secondary"
+                                   style="padding: 5px 10px; font-size: 11px;">
+                                    Edit
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr id="empty-row">
+                            <td colspan="12" class="empty">
+                                No products found. Add a row or import a file.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <span class="muted">
+                    {% if page_obj.paginator.count %}
+                        Showing {{ page_obj.start_index }}–{{ page_obj.end_index }}
+                        of {{ page_obj.paginator.count }} products
+                    {% else %}
+                        No saved products
+                    {% endif %}
+                </span>
+
+                <div>
+                    {% if page_obj.has_previous %}
+                        <a class="button secondary"
+                           href="?q={{ search|urlencode }}&category={{ selected_category }}&status={{ selected_status }}&page={{ page_obj.previous_page_number }}">
+                            Previous
+                        </a>
+                    {% endif %}
+
+                    <span style="font-size: 13px; margin: 0 8px;"> Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }} </span>
+
+                    {% if page_obj.has_next %}
+                        <a class="button secondary"
+                           href="?q={{ search|urlencode }}&category={{ selected_category }}&status={{ selected_status }}&page={{ page_obj.next_page_number }}">
+                            Next
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Template options for dynamic product row categories -->
+        <select id="category-template" hidden>
+            {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
+
+        <!-- Django provides a CSRF token for the inline-save request. -->
+        <form id="csrf-form" hidden>
+            {% csrf_token %}
+        </form>
+
+        <script>
+            const table = document.getElementById("product-table");
+            const addButton = document.getElementById("add-row");
+            const saveButton = document.getElementById("save-rows");
+            const message = document.getElementById("save-message");
+
+            const categoryTemplate = document.getElementById("category-template");
+            const categories = categoryTemplate
+                ? Array.from(categoryTemplate.options).map(opt => ({
+                    id: opt.value,
+                    name: opt.textContent
+                }))
+                : [];
+
+            function makeInput(name, type = "text", value = "") {
+                const input = document.createElement("input");
+                input.name = name;
+                input.type = type;
+                input.value = value;
+                return input;
+            }
+
+            function addCell(row, element) {
+                const cell = document.createElement("td");
+                cell.appendChild(element);
+                row.appendChild(cell);
+            }
+
+            function addProductRow() {
+                const emptyRow = document.getElementById("empty-row");
+                if (emptyRow) {
+                    emptyRow.remove();
+                }
+
+                const row = document.createElement("tr");
+                row.className = "new-product-row";
+
+                const counterCell = document.createElement("td");
+                counterCell.textContent = "+";
+                row.appendChild(counterCell);
+
+                addCell(row, makeInput("name"));
+                addCell(row, makeInput("sku"));
+
+                const categorySelect = document.createElement("select");
+                categorySelect.name = "category";
+
+                categories.forEach(category => {
+                    const option = document.createElement("option");
+                    option.value = category.id;
+                    option.textContent = category.name;
+                    categorySelect.appendChild(option);
+                });
+
+                addCell(row, categorySelect);
+                addCell(row, makeInput("brand"));
+                addCell(row, makeInput("purchase_price", "number"));
+                addCell(row, makeInput("selling_price", "number"));
+                addCell(row, makeInput("unit", "text", "Piece"));
+                addCell(row, makeInput("low_stock_threshold", "number", "10"));
+
+                const statusSelect = document.createElement("select");
+                statusSelect.name = "is_active";
+
+                [["true", "Active"], ["false", "Inactive"]].forEach(item => {
+                    const option = document.createElement("option");
+                    option.value = item[0];
+                    option.textContent = item[1];
+                    statusSelect.appendChild(option);
+                });
+
+                addCell(row, statusSelect);
+
+                const removeCell = document.createElement("td");
+                const removeButton = document.createElement("button");
+                removeButton.type = "button";
+                removeButton.className = "button secondary";
+                removeButton.style.padding = "6px 10px";
+                removeButton.textContent = "Remove";
+                removeButton.addEventListener("click", () => row.remove());
+                removeCell.appendChild(removeButton);
+                row.appendChild(removeCell);
+
+                table.appendChild(row);
+                row.querySelector('input[name="name"]').focus();
+            }
+
+            if (addButton) {
+                addButton.addEventListener("click", addProductRow);
+            }
+
+            if (saveButton) {
+                saveButton.addEventListener("click", async () => {
+                    const rows = Array.from(
+                        table.querySelectorAll(".new-product-row")
+                    );
+
+                    if (!rows.length) {
+                        message.textContent = "Add at least one new product row.";
+                        return;
+                    }
+
+                    const products = rows.map(row => {
+                        const data = {};
+                        row.querySelectorAll("input, select").forEach(field => {
+                            data[field.name] = field.value;
+                        });
+                        return data;
+                    });
+
+                    saveButton.disabled = true;
+                    message.textContent = "Saving products...";
+
+                    try {
+                        const csrfToken = document.querySelector(
+                            "#csrf-form [name=csrfmiddlewaretoken]"
+                        ).value;
+
+                        const response = await fetch("{% url 'inline_save' %}", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRFToken": csrfToken
+                            },
+                            body: JSON.stringify({ products })
+                        });
+
+                        const result = await response.json();
+
+                        if (!response.ok || !result.success) {
+                            const details = (result.errors || []).map(item => {
+                                const fields = Object.entries(item.errors)
+                                    .map(([field, errors]) => {
+                                        const messages = errors.map(error =>
+                                            typeof error === "string"
+                                                ? error
+                                                : error.message
+                                        ).join(", ");
+                                        return `${field}: ${messages}`;
+                                    }).join(" | ");
+
+                                return `Row ${item.row}: ${fields}`;
+                            });
+
+                            message.textContent = [
+                                result.message || "Please correct the rows.",
+                                ...details
+                            ].join(" ");
+                            return;
+                        }
+
+                        message.textContent = result.message;
+                        window.location.reload();
+                    } catch (error) {
+                        message.textContent =
+                            "Could not connect to the server. Check your connection and try again.";
+                    } finally {
+                        saveButton.disabled = false;
+                    }
+                });
+            }
+        </script>
+    {% endif %}
+</div>
+{% endblock %}

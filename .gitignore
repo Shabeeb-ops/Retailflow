@@ -1,0 +1,38 @@
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE and Editor configs
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+
+# Database
+*.sqlite3
+*.sqlite3-journal
+
+# Media / Static build outputs
+/media/
+staticfiles/
+
+# OS-generated files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Logs
+*.log
+

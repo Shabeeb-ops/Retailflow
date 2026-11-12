@@ -76,25 +76,6 @@
         <span>Dashboard</span>
     </a>
 
-    <!-- POS Terminal -->
-    <a href="{% url 'pos' %}" target="_blank"
-       class="menu-item {% if active_nav == 'pos' %}active{% endif %}"
-       title="Open POS Terminal">
-        <svg class="icon">
-            <use href="#i-pos"/>
-        </svg>
-        <span>POS Terminal</span>
-    </a>
-
-    <!-- Sales History -->
-    <a href="{% url 'pos_sales_history' %}"
-       class="menu-item {% if active_nav == 'pos_history' %}active{% endif %}">
-        <svg class="icon">
-            <use href="#i-sales"/>
-        </svg>
-        <span>Sales History</span>
-    </a>
-
     <!-- Products -->
     <a href="{% url 'product_list' %}"
        class="menu-item {% if active_nav == 'products' or request.resolver_match.url_name in 'product_list,add_category,import_products' or '/products/' in request.path %}active{% endif %}"
@@ -178,15 +159,6 @@
         <span>Expenses</span>
         <small class="coming">Soon</small>
     </span>
-
-    <!-- Reports -->
-    <a href="{% url 'pos_reports' %}"
-       class="menu-item {% if active_nav == 'pos_reports' %}active{% endif %}">
-        <svg class="icon">
-            <use href="#i-bars"/>
-        </svg>
-        <span>POS Reports</span>
-    </a>
 
     <div class="menu-title">Settings</div>
 

@@ -6,7 +6,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.paginator import Paginator
 from django.db.models import Count, IntegerField, Q, Sum, Value
 from django.db.models.functions import Coalesce
-from django.http import Http404, JsonResponse
+from django.http import Http404, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -47,6 +47,10 @@ def pos_terminal(request):
     - Dynamic cart management with hold/recall and thermal receipt checkout.
     """
     employee = getattr(request.user, "employee", None)
+    if not employee and hasattr(request.user, "company"):
+        messages.info(request, "The POS Terminal is operated by Cashiers. You can customize POS options in POS Settings.")
+        return redirect("pos_settings")
+
     if employee and employee.role not in ["CASHIER", "MANAGER"]:
         return HttpResponseForbidden("You do not have permission to access the POS Terminal.")
 
